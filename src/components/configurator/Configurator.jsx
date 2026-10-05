@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import TopBar from '../layout/TopBar.jsx'
-import CategoryRail from '../layout/CategoryRail.jsx'
 import Stage from '../layout/Stage.jsx'
 import OptionsPanel from './OptionsPanel.jsx'
 import DragGhost from '../objects/DragGhost.jsx'
@@ -92,13 +91,13 @@ export default function Configurator() {
     <div className="app">
       <TopBar onOpenSavedDesigns={() => setIsSavedDesignsOpen(true)} />
       <main className="workspace">
-        <CategoryRail activeCategory={activeCategory} onSelect={handleCategorySelect} />
         <Stage />
         <OptionsPanel
           activeCategory={activeCategory}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           onConfirm={handleConfirm}
+          onSelectCategory={handleCategorySelect}
         />
       </main>
       <DragGhost />

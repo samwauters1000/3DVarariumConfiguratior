@@ -1,9 +1,6 @@
 /* ---------- Layout after user testing ----------
    - Start over sits with undo / redo in the 3D view (not in the top bar).
-   - The section navigation (category rail) sits right next to the options panel it
-     controls, instead of on the far side of the 3D view:
-     desktop: a slim column directly beside the panel; tablet and phone: a row of tabs joined
-     onto the top of the panel, so they read as one block. */
+   - The section buttons sit at the top of the options card (see the end of this file). */
 
 /* Start over in the history group. */
 .history-controls__divider {
@@ -41,99 +38,6 @@
   }
 }
 
-/* Desktop: 3D view | rail | panel, with the rail tucked against the panel. */
-@media (min-width: 961px) {
-  .workspace {
-    grid-template-columns: minmax(0, 1fr) var(--rail-width) var(--panel-width);
-    grid-template-areas: 'stage rail panel';
-  }
-
-  .category-rail {
-    justify-self: end;
-    margin-right: calc(var(--space-2) - var(--gutter));
-  }
-
-  /* Tooltips open to the left now, over the 3D view instead of over the panel. */
-  .category-button__label {
-    left: auto;
-    right: calc(100% + var(--space-3));
-    transform: translate(4px, -50%);
-  }
-}
-
-/* Tablet and phone: 3D view on top, then the tabs joined onto the panel. */
-@media (max-width: 960px) {
-  .workspace {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'stage'
-      'rail'
-      'panel';
-    row-gap: 0;
-  }
-
-  .stage {
-    margin-bottom: var(--gutter);
-  }
-
-  .category-rail {
-    align-self: stretch;
-  }
-
-  .category-rail__list {
-    flex-direction: row;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-2) var(--space-1);
-    border-radius: var(--radius-surface) var(--radius-surface) 0 0;
-    box-shadow: none;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .category-rail__list > li {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .panel {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  /* Tabs with an icon and a label underneath. */
-  .category-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    width: 100%;
-    height: 60px;
-  }
-
-  .category-button__label,
-  .category-button.is-active .category-button__label,
-  .category-button:hover .category-button__label {
-    position: static;
-    padding: 0;
-    background: none;
-    color: inherit;
-    font-size: 0.75rem;
-    opacity: 1;
-    transform: none;
-  }
-
-  .category-button__badge {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .category-button__label,
-  .category-button.is-active .category-button__label {
-    font-size: 0.6875rem;
-  }
-}
-
 /* One title in the top bar: slightly smaller on phones so it fits next to the buttons. */
 @media (max-width: 640px) {
   .top-bar__brand {
@@ -145,5 +49,148 @@
   .top-bar__brand {
     font-size: 1rem;
     letter-spacing: -0.04em;
+  }
+}
+
+/* ---------- Section buttons at the top of the options card ----------
+   Order in the card: section title, the section buttons, the section's own heading
+   ("Choose a container"), then the options. The buttons sit on a sunken band with a
+   raised "chip" for the active section, like a segmented control, so they clearly read as
+   navigation and not as options. The old rail column is gone: 3D view | options card. */
+
+:root {
+  --panel-width: 400px;
+}
+
+@media (max-width: 1180px) {
+  :root {
+    --panel-width: 372px;
+  }
+}
+
+.workspace {
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
+  grid-template-areas: 'stage panel';
+}
+
+@media (max-width: 960px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'stage'
+      'panel';
+  }
+}
+
+.panel__header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.panel__header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.section-nav {
+  margin: 0 calc(var(--space-3) - var(--space-6));
+  container-type: inline-size;
+  container-name: section-nav;
+}
+
+/* Labels shrink with the space, so every section name stays readable in full. */
+@container section-nav (max-width: 370px) {
+  .section-nav .section-nav__label {
+    font-size: 0.625rem;
+    letter-spacing: -0.02em;
+  }
+}
+
+@container section-nav (max-width: 310px) {
+  .section-nav .section-nav__label {
+    font-size: 0.5625rem;
+    letter-spacing: -0.045em;
+  }
+
+  .section-nav .section-nav__button {
+    padding: 6px 0;
+  }
+}
+
+.section-nav__list {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+  box-shadow: inset 0 1px 2px rgba(47, 67, 43, 0.08);
+}
+
+.section-nav__button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 2px;
+  border: 0;
+  border-radius: calc(var(--radius-card) - 4px);
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: background-color var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.section-nav__label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.65625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-nav__button.is-active {
+  background: var(--color-panel);
+  color: var(--color-text);
+  box-shadow: 0 1px 2px rgba(47, 67, 43, 0.12), 0 2px 6px rgba(47, 67, 43, 0.08);
+}
+
+.section-nav__button.is-active .icon {
+  color: var(--color-confirm);
+}
+
+@media (hover: hover) {
+  .section-nav__button:not(.is-active):hover {
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--color-text);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .section-nav__button:active {
+    transform: scale(0.95);
+    transition: transform 80ms ease;
+  }
+}
+
+/* The section's own heading under the buttons. */
+.panel__section-heading {
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+/* Phones: the header has less side padding. */
+@media (max-width: 640px) {
+  .section-nav {
+    margin: 0 calc(var(--space-2) - var(--space-4));
   }
 }

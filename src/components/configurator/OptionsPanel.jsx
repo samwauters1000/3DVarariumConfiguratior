@@ -6,6 +6,7 @@ import DecorationOptions from '../decoration/DecorationOptions.jsx'
 import AnimalOptions from '../animals/AnimalOptions.jsx'
 import EquipmentOptions from '../equipment/EquipmentOptions.jsx'
 import CareTips from './CareTips.jsx'
+import SectionNav from '../layout/SectionNav.jsx'
 import { findLid, getLights } from '../../data/equipment.js'
 import PriceBreakdown from '../pricing/PriceBreakdown.jsx'
 import PanelFooter from '../pricing/PanelFooter.jsx'
@@ -87,7 +88,16 @@ function useScrollPerView(viewKey, contentRef, panelRef) {
   }
 }
 
-export default function OptionsPanel({ activeCategory, activeTab, onTabChange, onConfirm }) {
+// The heading under the section buttons, for sections whose options do not start with their
+// own "Choose …" heading (Terrarium and Ground already do).
+const SECTION_HEADINGS = {
+  plants: 'Choose your plants',
+  decoration: 'Add decoration',
+  equipment: 'Choose your lights',
+  animals: 'Add animals',
+}
+
+export default function OptionsPanel({ activeCategory, activeTab, onTabChange, onConfirm, onSelectCategory }) {
   const category = categories.find((item) => item.id === activeCategory)
   const subtitle = useCategorySubtitle(activeCategory)
   const CategoryOptions = optionComponents[activeCategory]
@@ -98,16 +108,21 @@ export default function OptionsPanel({ activeCategory, activeTab, onTabChange, o
 
   return (
     <aside ref={panelRef} className="panel" aria-label="Configuration options">
+      {/* Section title, then the section buttons, then (in the content) the section's own
+          heading and its options. */}
       <div className="panel__header">
-        <div className="panel__heading">
-          <h2 className="panel__title">{isPriceTab ? 'Price overview' : category.label}</h2>
-          <p className="panel__subtitle">{isPriceTab ? 'All selected items' : subtitle}</p>
+        <div className="panel__header-row">
+          <div className="panel__heading">
+            <h2 className="panel__title">{isPriceTab ? 'Price overview' : category.label}</h2>
+            <p className="panel__subtitle">{isPriceTab ? 'All selected items' : subtitle}</p>
+          </div>
+          {isPriceTab && (
+            <button type="button" className="text-button panel__back" onClick={() => onTabChange('options')}>
+              Back to {category.label.toLowerCase()}
+            </button>
+          )}
         </div>
-        {isPriceTab && (
-          <button type="button" className="text-button panel__back" onClick={() => onTabChange('options')}>
-            Back to {category.label.toLowerCase()}
-          </button>
-        )}
+        <SectionNav activeCategory={isPriceTab ? null : activeCategory} onSelect={onSelectCategory} />
       </div>
 
       <div ref={contentRef} className="panel__content" id="panel-content" aria-live="polite" onScroll={rememberScroll}>
@@ -115,6 +130,7 @@ export default function OptionsPanel({ activeCategory, activeTab, onTabChange, o
           <PriceBreakdown />
         ) : (
           <>
+            {SECTION_HEADINGS[activeCategory] && <h3 className="section-label panel__section-heading">{SECTION_HEADINGS[activeCategory]}</h3>}
             {CARE_TIP_CATEGORIES.has(activeCategory) && <CareTips />}
             <CategoryOptions />
           </>
