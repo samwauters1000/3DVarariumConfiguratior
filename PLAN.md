@@ -227,6 +227,24 @@ Feedback from tests with real people, and what was done (`styles/flow.css`):
 | 4 | Confirm is used as a "next" button | **Not needed anymore** (decided after the new card layout; Confirm stays as it is). |
 | 5 | The overall flow needs fixing without cluttering the right side with buttons | **In progress.** The card layout (title, section buttons, heading, description, selection, options) is the first step. |
 
+### Expert UX review (for point 5, the overall flow)
+
+Method: an expert review against Nielsen's 10 heuristics, plus a first-time-user walkthrough of one task ("design a terrarium for a dart frog") on desktop (1440 px) and phone (390 px), with no saved state. Severity: 4 = blocks or misleads people, 3 = major, 2 = minor, 1 = cosmetic. All findings are open.
+
+| # | Finding | Heuristic | Severity |
+|---|---|---|---|
+| R1 | After choosing a container (or a ground), nothing points to the next section; the panel just stays where it is. | Visibility of system status | 4 |
+| R2 | It is not shown which sections are required (container, ground, a plant) and which are optional (decoration, lights, animals). "Nothing selected" looks the same for both. | Match with the real world; recognition | 3 |
+| R3 | Plants (and other sections) can be opened before a ground is chosen; every card then says "Unavailable · Choose a ground first", but there is no single message or way back to Ground. | Error prevention; help users recover | 3 |
+| R4 | The section buttons show no progress: you cannot see which sections are done. | Visibility of system status | 3 |
+| R5 | Phone: after tapping a section, the options start about 300 px below the screen; it looks as if nothing happened. After adding a plant, its card and panel are off-screen too. | Visibility of system status | 3 |
+| R6 | The first-visit tips are generic and stay until "Got it": they mention plants while you are choosing a container, and on phones they cover most of the 3D view and overlap the object toolbar. | Help and documentation; aesthetic design | 2 |
+| R7 | The summary is a dead end besides "Download PDF": no Save design or Copy link, which are the natural next steps after finishing. | User control and freedom | 2 |
+| R8 | "Fill for me" is disabled before a ground is chosen, and the reason is only in a tooltip (invisible on touch). | Visibility; help users recover | 2 |
+| R9 | Care warnings only show inside the Plants, Decoration, Lights and Animals panels; a warning made in one section is easy to miss from another. | Visibility of system status | 2 |
+
+What already works well: real-time price, undo/redo plus Start over, clear disabled reasons on each card, care warnings with concrete advice, consistent visual language, and the new card order (title, section buttons, heading, description, selection).
+
 ### Building order and panel layout
 
 - **Sub-titles:** every heading inside the panel is a real sub-title, one step below the panel title: 16 px (text above the options is kept between 12 and 16 px), bold, in the text colour, with a count where useful (`.section-label` and the foldable section headings). This covers Small / Medium / Large / Special, Choose a container, Special shapes, Choose a ground layer, Lid, Day light, Extra lights, Selected …, In your terrarium and Saved designs.
