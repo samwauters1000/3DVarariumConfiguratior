@@ -88,13 +88,27 @@ function useScrollPerView(viewKey, contentRef, panelRef) {
   }
 }
 
-// The heading under the section buttons, for sections whose options do not start with their
-// own "Choose …" heading (Terrarium and Ground already do).
-const SECTION_HEADINGS = {
-  plants: 'Choose your plants',
-  decoration: 'Add decoration',
-  equipment: 'Choose your lights',
-  animals: 'Add animals',
+// The block under the section buttons: the section's heading, what it is for (a larger
+// line) and, smaller, what is chosen and its price.
+const SECTION_INTROS = {
+  terrarium: { heading: 'Choose a container', description: 'The container decides how big your terrarium is and which plants and lights fit.' },
+  ground: { heading: 'Choose a ground layer', description: 'The ground decides which plants can grow in your terrarium.' },
+  plants: { heading: 'Choose your plants', description: 'Only plants that suit your ground and container can be added.' },
+  decoration: { heading: 'Add decoration', description: 'Stones and wood make it look natural, and give climbers and animals something to use.' },
+  equipment: { heading: 'Choose your lights', description: 'Lights help plants grow and make your terrarium glow at night.' },
+  animals: { heading: 'Add animals', description: 'Small animals that suit your ground and plants. They move in last.' },
+}
+
+function SectionIntro({ categoryId, selection }) {
+  const intro = SECTION_INTROS[categoryId]
+  if (!intro) return null
+  return (
+    <div className="panel__intro">
+      <h3 className="section-label">{intro.heading}</h3>
+      <p className="panel__intro-description">{intro.description}</p>
+      <p className="panel__intro-selection">{selection}</p>
+    </div>
+  )
 }
 
 export default function OptionsPanel({ activeCategory, activeTab, onTabChange, onConfirm, onSelectCategory }) {
@@ -109,12 +123,12 @@ export default function OptionsPanel({ activeCategory, activeTab, onTabChange, o
   return (
     <aside ref={panelRef} className="panel" aria-label="Configuration options">
       {/* Section title, then the section buttons, then (in the content) the section's own
-          heading and its options. */}
+          heading, its description, what is chosen, and the options. */}
       <div className="panel__header">
         <div className="panel__header-row">
           <div className="panel__heading">
             <h2 className="panel__title">{isPriceTab ? 'Price overview' : category.label}</h2>
-            <p className="panel__subtitle">{isPriceTab ? 'All selected items' : subtitle}</p>
+            {isPriceTab && <p className="panel__subtitle">All selected items</p>}
           </div>
           {isPriceTab && (
             <button type="button" className="text-button panel__back" onClick={() => onTabChange('options')}>
@@ -130,7 +144,7 @@ export default function OptionsPanel({ activeCategory, activeTab, onTabChange, o
           <PriceBreakdown />
         ) : (
           <>
-            {SECTION_HEADINGS[activeCategory] && <h3 className="section-label panel__section-heading">{SECTION_HEADINGS[activeCategory]}</h3>}
+            <SectionIntro categoryId={activeCategory} selection={subtitle} />
             {CARE_TIP_CATEGORIES.has(activeCategory) && <CareTips />}
             <CategoryOptions />
           </>

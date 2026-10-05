@@ -127,8 +127,7 @@ export default function TerrariumOptions() {
 
   return (
     <>
-      <section className="option-section" aria-labelledby="terrarium-options-title">
-        <h3 id="terrarium-options-title" className="section-label">Choose a container</h3>
+      <section className="option-section" aria-label="Containers">
         <TerrariumList items={regular} {...listProps} />
       </section>
 

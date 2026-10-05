@@ -27,10 +27,8 @@ export default function GroundOptions() {
   }
 
   return (
-    <section className="option-section" aria-labelledby="ground-options-title">
-      <h3 id="ground-options-title" className="section-label">Choose a ground layer</h3>
+    <section className="option-section" aria-label="Ground layers">
       {isLocked && <Alert tone="warning">Choose a terrarium before adding a ground layer.</Alert>}
-      <p className="section-note">The ground decides which plants can grow in your terrarium.</p>
       <ul className="option-list">
         {groundTypes.map((ground) => {
           const suitablePlants = getPlantsForGround(ground.id)

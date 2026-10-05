@@ -184,9 +184,25 @@
   }
 }
 
-/* The section's own heading under the buttons. */
-.panel__section-heading {
-  margin-bottom: calc(var(--space-2) * -1);
+/* Under the section buttons: heading, what the section is for (larger), and what is
+   chosen with its price (smaller). */
+.panel__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.panel__intro-description {
+  margin-top: var(--space-1);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  line-height: 1.45;
+}
+
+.panel__intro-selection {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
 }
 
 /* Phones: the header has less side padding. */
