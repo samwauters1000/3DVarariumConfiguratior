@@ -133,3 +133,17 @@
     font-size: 0.6875rem;
   }
 }
+
+/* One title in the top bar: slightly smaller on phones so it fits next to the buttons. */
+@media (max-width: 640px) {
+  .top-bar__brand {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .top-bar__brand {
+    font-size: 1rem;
+    letter-spacing: -0.04em;
+  }
+}

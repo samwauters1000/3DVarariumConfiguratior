@@ -4,10 +4,8 @@ import AccountButton from '../auth/AccountButton.jsx'
 export default function TopBar({ onOpenSavedDesigns }) {
   return (
     <header className="top-bar">
-      <div className="top-bar__brand">
-        Vararium
-      </div>
-      <h1 className="top-bar__title">Vararium Configurator</h1>
+      {/* One title only (after user testing): bold, on the left. */}
+      <h1 className="top-bar__brand">Vararium Configurator</h1>
       <div className="top-bar__actions">
         <button type="button" className="button button--ghost" data-anim="pop" onClick={onOpenSavedDesigns} title="Saved designs">
           <Icon name="bookmark" size={18} />

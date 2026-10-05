@@ -1,6 +1,6 @@
 # Vararium Configurator - Development Plan
 
-The product name is **Vararium** (top bar: "Vararium", title: "Vararium Configurator", browser tab: "Vararium Configurator" with the terrarium icon in the darkest green of the palette (`#2f432b`, `--color-dark`), see `public/favicon.svg`).
+The product name is **Vararium** (top bar: one bold title "Vararium Configurator" on the left, browser tab: "Vararium Configurator" with the terrarium icon in the darkest green of the palette (`#2f432b`, `--color-dark`), see `public/favicon.svg`).
 
 ## Progress
 
@@ -222,8 +222,8 @@ Feedback from tests with real people, and what was done (`styles/flow.css`):
 | # | Feedback | Status |
 |---|---|---|
 | 1 | Start over should be next to the undo button | **Done:** Start over sits in the undo / redo group at the top left of the 3D view, after a small divider (icon + "Start over"; icon only in narrow 3D views). It is no longer in the top bar. It can still be undone. |
-| 2 | Only one title: "Vararium Configurator" in bold on the left, where "Vararium" is now | To do |
-| 3 | The section navigation is too far from the options it controls | **Done:** on desktop the category rail moved from the far left to directly beside the options panel (3D view, rail, panel; 8 px from the panel), with its tooltips opening to the left. On tablet and phone it is a row of tabs (icon + label) joined onto the top of the panel, so tabs and options read as one block. |
+| 2 | Only one title: "Vararium Configurator" in bold on the left, where "Vararium" is now | **Done:** the top bar has one title, "Vararium Configurator", bold on the left (the page `h1`); the centre title is gone. It shrinks a little on phones (18 px, 16 px under 360 px) so it always fits next to the buttons. |
+| 3 | The section navigation is too far from the options it controls | **First attempt, not good enough yet (to revisit):** on desktop the category rail moved from the far left to directly beside the options panel (3D view, rail, panel; 8 px from the panel), with its tooltips opening to the left. On tablet and phone it is a row of tabs (icon + label) joined onto the top of the panel, so tabs and options read as one block. |
 | 4 | Confirm is used as a "next" button | To do (flow idea needed) |
 | 5 | The overall flow needs fixing without cluttering the right side with buttons | To do (flow idea needed) |
 
