@@ -20,9 +20,10 @@ import { getGraphicsQuality, QUALITY_SETTINGS } from './graphicsQuality.js'
 const CLICK_DRAG_TOLERANCE = 4
 
 // Day: soft, warm studio light like 3DStylePlants.jpg (bright sky fill, warm key light from
-// the front-left, cool rim light). Night (DarkModeLamp.jpg): a dark grey-green room, only a
-// faint cool glow from a window, and a warm desk lamp on the workbench; the terrarium's own
-// lights and glowing decoration stand out.
+// the front-left, cool rim light); the desk lamp is off. Night (DarkModeLamp.jpg): a dark
+// grey-green room with only a very faint cool glow from a window. The desk lamp is on and
+// lights the terrarium, so the background and the bench stay dark outside its light; the
+// terrarium's own lights and glowing decoration stand out.
 const LIGHTING = {
   day: {
     background: '#e8ebdf',
@@ -34,12 +35,12 @@ const LIGHTING = {
     ring: '#e3e8d8',
   },
   night: {
-    background: '#2a2f2b',
-    ambient: 0.1,
-    hemisphere: ['#9aa59a', '#1f2420', 0.28],
-    key: { intensity: 0.14, color: '#c8d2ff' },
-    rim: { intensity: 0.16, color: '#aab6c8' },
-    environment: 0.18,
+    background: '#232825',
+    ambient: 0.04,
+    hemisphere: ['#9aa59a', '#1f2420', 0.14],
+    key: { intensity: 0.07, color: '#c8d2ff' },
+    rim: { intensity: 0.1, color: '#aab6c8' },
+    environment: 0.12,
     ring: '#8a9688',
   },
 }
@@ -175,14 +176,7 @@ export default function TerrariumScene() {
       <color attach="background" args={[mode.background]} />
       <Lighting shadowMapSize={quality.shadowMapSize} mode={mode} />
       <Floor ringRadius={view.ringRadius} shadowScale={view.ringRadius * 3.3} mode={mode} />
-      {nightMode && (
-        <DeskLamp
-          ringRadius={view.ringRadius}
-          topY={terrarium?.top?.y ?? 1.4}
-          targetY={(terrarium ? getSoilSurfaceY(terrarium) : 0) + 0.1}
-          castShadow={quality.ambientOcclusion}
-        />
-      )}
+      <DeskLamp ringRadius={view.ringRadius} on={nightMode} />
       <CameraControls controlsRef={controlsRef} terrarium={terrarium} />
       <ShadowSetup />
       <SceneBridge terrarium={terrarium} />

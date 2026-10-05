@@ -112,14 +112,15 @@ export default function Workbench({ ringRadius }) {
         />
       ))}
 
-      {/* Props at the back: a stack of pots, a small pot and a trowel. */}
+      {/* Props: a stack of pots at the back left and a trowel at the front right (the desk
+          lamp stands at the back right). */}
       <group position={[-width * 0.38, 0, -depth * 0.3]}>
         <Pot position={[0, 0, 0]} radius={ringRadius * 0.14} />
         <Pot position={[0, ringRadius * 0.1, 0]} radius={ringRadius * 0.14} />
         <Pot position={[0, ringRadius * 0.2, 0]} radius={ringRadius * 0.14} />
         <Pot position={[ringRadius * 0.3, 0, ringRadius * 0.12]} radius={ringRadius * 0.09} />
       </group>
-      <Trowel position={[width * 0.36, 0, -depth * 0.26]} rotationY={-0.7} size={ringRadius * 0.55} />
+      <Trowel position={[width * 0.31, 0, depth * 0.16]} rotationY={-0.9} size={ringRadius * 0.55} />
     </group>
   )
 }

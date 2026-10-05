@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { AdditiveBlending, CanvasTexture, CatmullRomCurve3, DoubleSide, Quaternion, SphereGeometry, Vector3 } from 'three'
+import { AdditiveBlending, CanvasTexture, CatmullRomCurve3, Color, CylinderGeometry, DoubleSide, Quaternion, SphereGeometry, Vector3 } from 'three'
 import { findLid, getLights } from '../../data/equipment.js'
 import { getLightSpots, getPlantingArea } from '../../rules/placementRules.js'
 import { getSoilSurfaceY } from '../GroundLayers.jsx'
@@ -12,9 +12,10 @@ import { brassMaterialProps, glassMaterialProps, GLASS_RENDER_ORDER } from '../m
 //   open bowl. LED bar, LED puck, UVB tube (next to the bar) and a small moonlight LED.
 // - On the soil: a glowing mushroom cluster at its fixed spot, and fairy lights draped in
 //   loops around the edge.
-// Every light adds real light to the scene with a soft glow around the source: subtle by
-// day, strong in night mode, where the day light also casts soft shadows (capable devices)
-// and shows a faint beam. The moonlight LED is only on at night.
+// Every light adds real light to the scene: subtle by day, strong in night mode, where the
+// day light also casts soft shadows (capable devices) and shows a soft beam down to the
+// soil. Small bulbs (moonlight LED, cork LED, fairy lights, mushrooms) get a soft glow; the
+// LED bar, puck and UVB tube do not. The moonlight LED is only on at night.
 
 const LID_THICKNESS = 0.028
 const UP = new Vector3(0, 1, 0)
@@ -116,14 +117,70 @@ function Halo({ position, size, color, nightMode, day = 0.18, night = 0.85 }) {
   )
 }
 
-// Faint beam of light under a lamp, only visible in the dark (humid air in a terrarium
-// scatters a little light).
-function LightBeam({ y, height, topRadius, bottomRadius, color, nightMode }) {
+// The beam has no hard edges, like light in humid air: it is brightest in the middle and
+// fades out towards its sides (where you look along the cone's surface) and towards the soil.
+const beamVertexShader = /* glsl */ `
+  varying vec3 vNormalView;
+  varying vec3 vViewPosition;
+  varying float vHeight;
+  void main() {
+    vHeight = uv.y; // 1 at the lamp, 0 at the soil
+    vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewPosition = -viewPosition.xyz;
+    vNormalView = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * viewPosition;
+  }
+`
+const beamFragmentShader = /* glsl */ `
+  uniform vec3 color;
+  uniform float opacity;
+  varying vec3 vNormalView;
+  varying vec3 vViewPosition;
+  varying float vHeight;
+  void main() {
+    float facing = abs(dot(normalize(vNormalView), normalize(vViewPosition)));
+    float sides = pow(facing, 3.5);
+    float fade = smoothstep(0.0, 0.9, vHeight) * smoothstep(1.0, 0.94, vHeight);
+    gl_FragColor = vec4(color, opacity * sides * fade);
+    #include <colorspace_fragment>
+  }
+`
+
+// Open cone with an oval top and bottom ([x, z] radii), so a long bar gets a long beam.
+function makeBeamGeometry(top, bottom, height) {
+  const geometry = new CylinderGeometry(1, 1, height, 32, 1, true)
+  const position = geometry.attributes.position
+  for (let index = 0; index < position.count; index++) {
+    const [radiusX, radiusZ] = position.getY(index) > 0 ? top : bottom
+    position.setX(index, position.getX(index) * radiusX)
+    position.setZ(index, position.getZ(index) * radiusZ)
+  }
+  geometry.computeVertexNormals()
+  return geometry
+}
+
+// Faint beam of light from a lamp down to the soil, only visible in the dark (humid air in a
+// terrarium scatters a little light). `limit` ([x, z]) keeps it inside the glass.
+function LightBeam({ y, surfaceY, top, bottom, limit, color, nightMode }) {
+  const uniforms = useMemo(() => ({ color: { value: new Color(color) }, opacity: { value: 0.22 } }), [color])
+  const height = y - surfaceY
+  const geometry = useMemo(() => {
+    const bottomRadii = [Math.min(bottom[0], limit[0]), Math.min(bottom[1], limit[1])]
+    const topRadii = [Math.min(top[0], bottomRadii[0]), Math.min(top[1], bottomRadii[1])]
+    return makeBeamGeometry(topRadii, bottomRadii, height)
+  }, [top[0], top[1], bottom[0], bottom[1], limit[0], limit[1], height]) // eslint-disable-line react-hooks/exhaustive-deps
   if (!nightMode) return null
   return (
-    <mesh position={[0, y - height / 2, 0]} renderOrder={GLASS_RENDER_ORDER + 1}>
-      <cylinderGeometry args={[topRadius, bottomRadius, height, 24, 1, true]} />
-      <meshBasicMaterial color={color} transparent opacity={0.05} side={DoubleSide} depthWrite={false} blending={AdditiveBlending} toneMapped={false} />
+    <mesh position={[0, y - height / 2, 0]} geometry={geometry} renderOrder={GLASS_RENDER_ORDER + 1}>
+      <shaderMaterial
+        vertexShader={beamVertexShader}
+        fragmentShader={beamFragmentShader}
+        uniforms={uniforms}
+        transparent
+        side={DoubleSide}
+        depthWrite={false}
+        blending={AdditiveBlending}
+      />
     </mesh>
   )
 }
@@ -190,10 +247,9 @@ function BarHangers({ half, y, z = 0, mount }) {
 
 // Full-spectrum LED bar at its real length: slim aluminium profile (1.2 × 2.4 cm) with a row of
 // LEDs behind a diffuser.
-function BarLamp({ light, mount, cm, nightMode, intensity, castShadow }) {
+function BarLamp({ light, mount, cm, nightMode, intensity, castShadow, surfaceY, beamLimit }) {
   const { barY } = mount
   const length = cm(light.sizeCm)
-  const ledCount = Math.max(4, Math.round(light.sizeCm / 3))
   return (
     <group>
       <group position={[0, barY, 0]}>
@@ -205,20 +261,9 @@ function BarLamp({ light, mount, cm, nightMode, intensity, castShadow }) {
           <boxGeometry args={[length * 0.95, cm(0.15), cm(1.6)]} />
           <meshStandardMaterial {...glowMaterial(light.color, nightMode, 1.4, 3)} />
         </mesh>
-        {Array.from({ length: ledCount }, (_, index) => (
-          <Halo
-            key={index}
-            position={[(index / (ledCount - 1) - 0.5) * length * 0.9, -cm(0.9), 0]}
-            size={cm(3)}
-            color={light.color}
-            nightMode={nightMode}
-            day={0.12}
-            night={0.55}
-          />
-        ))}
       </group>
       <BarHangers half={length * 0.4} y={barY} mount={mount} />
-      <LightBeam y={barY - cm(1.2)} height={barY * 0.8} topRadius={length * 0.35} bottomRadius={length * 0.6} color={light.color} nightMode={nightMode} />
+      <LightBeam y={barY - cm(0.8)} surfaceY={surfaceY} top={[length * 0.35, length * 0.2]} bottom={[length * 0.65, length * 0.65]} limit={beamLimit} color={light.color} nightMode={nightMode} />
       <DownLight position={[0, barY - cm(1.6), 0]} color={light.color} intensity={intensity} angle={1.1} distance={barY + 1} castShadow={castShadow} />
     </group>
   )
@@ -240,7 +285,6 @@ function UvbLamp({ light, mount, cm, nightMode, intensity }) {
           <cylinderGeometry args={[cm(0.8), cm(0.8), length * 0.96, 10]} />
           <meshStandardMaterial {...glowMaterial(light.color, nightMode, 1.3, 2.6)} />
         </mesh>
-        <Halo position={[0, -cm(0.4), 0]} size={length * 0.5} color="#b8a8ff" nightMode={nightMode} day={0.08} night={0.35} />
       </group>
       <BarHangers half={length * 0.4} y={barY} z={z} mount={mount} />
       <DownLight position={[0, barY - cm(1.2), z]} color={light.color} intensity={intensity} angle={0.9} distance={barY + 0.8} />
@@ -254,7 +298,7 @@ function Rod({ mount }) {
 }
 
 // Round, flat LED puck at its real size (Ø 7 cm, 1.2 cm thick), fixed under the top.
-function PuckLamp({ light, mount, cm, nightMode, intensity, castShadow }) {
+function PuckLamp({ light, mount, cm, nightMode, intensity, castShadow, surfaceY, beamLimit }) {
   const { puckY, ceilingY } = mount
   const radius = cm(light.sizeCm / 2)
   return (
@@ -268,10 +312,9 @@ function PuckLamp({ light, mount, cm, nightMode, intensity, castShadow }) {
           <circleGeometry args={[radius * 0.8, 20]} />
           <meshStandardMaterial {...glowMaterial(light.color, nightMode, 1.4, 3)} side={DoubleSide} />
         </mesh>
-        <Halo position={[0, -cm(1), 0]} size={radius * 2.4} color={light.color} nightMode={nightMode} day={0.14} night={0.6} />
       </group>
       <Cable from={[0, puckY + cm(0.6), 0]} to={[0, ceilingY, 0]} radius={0.008} />
-      <LightBeam y={puckY - cm(1)} height={puckY * 0.75} topRadius={radius * 0.8} bottomRadius={radius * 4.5} color={light.color} nightMode={nightMode} />
+      <LightBeam y={puckY - cm(0.7)} surfaceY={surfaceY} top={[radius * 0.8, radius * 0.8]} bottom={[radius * 4.5, radius * 4.5]} limit={beamLimit} color={light.color} nightMode={nightMode} />
       <DownLight position={[0, puckY - cm(1.4), 0]} color={light.color} intensity={intensity} angle={1.15} distance={puckY + 1} castShadow={castShadow} />
     </group>
   )
@@ -419,6 +462,9 @@ export default function Equipment({ terrarium, configuration, nightMode, shadows
   // Small containers get weaker special lights, so their glass does not flood with light.
   const strength = (light) => light.intensity * (nightMode ? 2.2 : 0.6) * (light.kind === 'special' ? plantScale ** 2 : 1)
 
+  // The light beam stays inside the soil area, so it never sticks out through the glass.
+  const beamLimit = [area.halfX * 0.9, area.halfZ * 0.9]
+
   const mount = terrarium.lightMount
   const needsRod = mount?.rod && lights.some((light) => ['bar', 'uvb', 'puck', 'moon'].includes(light.style))
 
@@ -427,7 +473,7 @@ export default function Equipment({ terrarium, configuration, nightMode, shadows
       {lid && terrarium.top && <Lid lid={lid} top={terrarium.top} />}
       {needsRod && <Rod mount={mount} />}
       {lights.map((light) => {
-        const props = { light, cm, nightMode, intensity: strength(light) }
+        const props = { light, cm, nightMode, intensity: strength(light), surfaceY, beamLimit }
         // Only the day light casts shadows, and only at night (one extra shadow map).
         const castShadow = shadows && nightMode
         if (!mount) return null

@@ -338,15 +338,15 @@ Stored as `lid` (id or null) and `lights` (list of ids) in the configuration, pa
 - **The mushroom lamp has a fixed spot** on the soil (back left). It counts as an obstacle: plants, decoration and animals cannot be placed on it, and anything already standing there moves aside when it is switched on.
 - **Switching container:** lights that do not fit the new container are listed in the confirmation ("These lights do not fit inside it: LED Grow Bar 20 cm") and removed. A lid only stays if the new container can take one. Saved or shared data with invalid lids or lights is cleaned up.
 - Terrariums say whether they are `closed` (Glass Dome, Geometric, Brass Heart, Tiny Bottle: own lid or narrow opening) or `lidable` (Open Bowl, Panorama Tank). Closed containers show the lid cards disabled with "The … is closed and already has its own top". A terrarium's `top` places the lid on the rim.
-- **Realistic lighting:** every light adds real light to the scene with the colour of the real product, and a soft glow (halo) around each source, sized to the real light.
-  - By day the lights are on but subtle. In **night mode all lights are clearly on**: stronger light, bright glows, a faint beam of light under the day light, and soft shadows from the day light on capable (desktop) devices.
+- **Realistic lighting:** every light adds real light to the scene with the colour of the real product. Small bulbs (moonlight LED, cork LED, fairy lights, glowing mushrooms) get a soft glow (halo) sized to the real bulb. The LED bar, LED puck and UVB tube have no round glows: only their glowing diffuser and the light beam show they are on.
+  - By day the lights are on but subtle. In **night mode all lights are clearly on**: stronger light, bright glows, a soft beam of light from the day light down to the soil, and soft shadows from the day light on capable (desktop) devices. The beam has no hard edges: it is brightest in the middle and fades out towards its sides and towards the soil, like light in humid air (a small shader in `scene/equipment/Equipment.jsx`). Under a long LED bar the beam is stretched along the bar, and it always stays inside the soil area, so it never sticks out through the glass.
   - Extra lights are dimmer in small containers, so their glass does not flood with light.
 
 ### Night mode and Save picture
 
 Two buttons at the top right of the 3D view (`components/controls/ViewControls.jsx`):
 
-- **Night mode** (moon / sun): a dark grey-green room with a faint cool window glow, a warm architect's desk lamp on the workbench shining on the terrarium, and dark frosted-glass controls (`LIGHTING` in `scene/TerrariumScene.jsx`, `scene/DeskLamp.jsx`; see "Night mode with the desk lamp" under the moodboard). All lights are clearly on (glows, light beam, shadows from the day light); the moonlight LED only switches on at night. Glowing decoration (Glow Mushrooms) stands out too. The state lives in `useSceneApi` and is not saved with the design.
+- **Night mode** (moon / sun): a dark grey-green room with a very faint cool window glow; the desk lamp on the workbench is switched on and lights the terrarium you are building, while the background and the rest of the bench stay dark outside its light, and dark frosted-glass controls (`LIGHTING` in `scene/TerrariumScene.jsx`, `scene/DeskLamp.jsx`; see "Night mode with the desk lamp" under the moodboard). All lights are clearly on (glows, light beam, shadows from the day light); the moonlight LED only switches on at night. Glowing decoration (Glow Mushrooms) stands out too. The state lives in `useSceneApi` and is not saved with the design.
 - **Save picture** (camera): downloads a PNG of the current camera view (`vararium-YYYY-MM-DD.png`), without the editing helpers (grid, selection rings). It uses the same snapshot as the summary, with `keepView` so the user's own angle is kept.
 
 ### Care info and care warnings
@@ -1665,9 +1665,10 @@ The terrarium stands on a low-poly wooden potting bench instead of the floor gri
 
 ### Night mode with the desk lamp (`DarkModeLamp.jpg`)
 
-- Night mode is a dark grey-green room (`#2a2f2b`) with only a faint cool glow from a window, instead of the earlier navy blue.
-- A black architect's desk lamp stands on the bench behind the container (`scene/DeskLamp.jsx`). It has a round base, double arms with joints and a shade with a warm glowing inside, and it shines a warm spot light onto the terrarium. On desktop that light casts soft shadows.
-- The lamp is sized and placed to the container, and only appears in night mode.
+- Night mode is a dark grey-green room (`#232825`) with only a very faint cool glow from a window, instead of the earlier navy blue. The room light is kept very low, so the background and the bench are dark except where the desk lamp shines.
+- A black architect's desk lamp **always** stands on the workbench (`scene/DeskLamp.jsx`), by day too. It has a round base, double arms with joints and a shade with a bulb.
+- **Fixed spot:** the base stands in the back-right corner of the bench and the head hangs just outside the 360° ring, aimed at the middle of the terrarium. It does not move when another container is chosen: like the bench, it is sized to the camera view (`ringRadius`), so it is at the same place on the bench and fully in view next to every container (and on the empty bench). The trowel moved to the front right to make room.
+- **Off by day, on at night:** by day the shade is plain inside and gives no light. In night mode the inside of the shade glows warm and the lamp shines a warm spot light on the terrarium with a very soft edge (penumbra 1), so the light fades out on the bench instead of ending in a hard circle. The lamp casts no shadows, because those drew hard dark lines across the soil.
 
 ### Frosted glass UI (`UIComponentsFrostedGlassEffect.jpg`)
 

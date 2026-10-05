@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
-import { AdditiveBlending, DoubleSide, Object3D, Quaternion, Vector3 } from 'three'
+import { DoubleSide, Object3D, Quaternion, Vector3 } from 'three'
 
-// Night mode (DarkModeLamp.jpg): a black architect's desk lamp stands on the workbench and
-// shines a warm light onto the terrarium, like working on it late in the evening. Placed
-// behind-left of the container and sized to it.
+// A black architect's desk lamp (DarkModeLamp.jpg) always stands on the workbench, at one
+// fixed spot at the back right: it does not move when another container is chosen. Like the
+// bench, it is sized to the camera view (`ringRadius`), so it looks the same next to every
+// container. By day it is off; in night mode it is on and lights the terrarium you are
+// building, while the rest of the room stays dark.
 
 const UP = new Vector3(0, 1, 0)
 const DOWN = new Vector3(0, -1, 0)
@@ -39,20 +41,23 @@ function Joint({ position, radius }) {
   )
 }
 
-export default function DeskLamp({ ringRadius, topY, targetY, castShadow }) {
-  const size = Math.min(1.1, Math.max(0.45, ringRadius * 0.6))
+export default function DeskLamp({ ringRadius: r, on }) {
+  const size = r * 0.45
   const layout = useMemo(() => {
-    const base = [-ringRadius * 1.3, 0, -ringRadius * 0.8]
+    // Base in the back-right corner of the bench, arms up and back, head just outside the
+    // 360° ring (so it never touches a container) and aimed at the middle of the terrarium.
+    const base = [r * 1.25, 0, -r * 1.1]
     const shoulder = [base[0], 0.08 * size, base[2]]
-    // Head just above and beside the container top, so the whole lamp stays in view.
-    const elbow = [base[0] - ringRadius * 0.12, topY * 0.5 + 0.45 * size, base[2] - ringRadius * 0.1]
-    const head = [-ringRadius * 0.8, topY + 0.22 * size, -ringRadius * 0.5]
-    const target = [0, targetY, 0]
+    const elbow = [r * 1.35, r * 0.8, -r * 1.3]
+    const head = [r * 0.85, r * 1.05, -r * 0.85]
+    const target = [0, r * 0.25, 0]
     const direction = new Vector3(target[0] - head[0], target[1] - head[1], target[2] - head[2]).normalize()
     // The shade opens along -y, turned to face the terrarium.
     const shadeRotation = new Quaternion().setFromUnitVectors(DOWN, direction)
-    return { base, shoulder, elbow, head, target, shadeRotation }
-  }, [ringRadius, topY, targetY, size])
+    // The light sits at the bulb, inside the shade.
+    const bulb = direction.clone().multiplyScalar(0.2 * size).add(new Vector3(...head)).toArray()
+    return { base, shoulder, elbow, head, target, shadeRotation, bulb }
+  }, [r, size])
 
   const lightTarget = useMemo(() => new Object3D(), [])
   const offset = 0.02 * size
@@ -67,15 +72,15 @@ export default function DeskLamp({ ringRadius, topY, targetY, castShadow }) {
       {/* Double arms, like a real architect's lamp */}
       {[-1, 1].map((side) => (
         <group key={side}>
-          <Rod from={[layout.shoulder[0] + side * offset, layout.shoulder[1], layout.shoulder[2]]} to={[layout.elbow[0] + side * offset, layout.elbow[1], layout.elbow[2]]} radius={0.011 * size} />
-          <Rod from={[layout.elbow[0] + side * offset, layout.elbow[1], layout.elbow[2]]} to={[layout.head[0] + side * offset, layout.head[1], layout.head[2]]} radius={0.011 * size} />
+          <Rod from={[layout.shoulder[0], layout.shoulder[1], layout.shoulder[2] + side * offset]} to={[layout.elbow[0], layout.elbow[1], layout.elbow[2] + side * offset]} radius={0.011 * size} />
+          <Rod from={[layout.elbow[0], layout.elbow[1], layout.elbow[2] + side * offset]} to={[layout.head[0], layout.head[1], layout.head[2] + side * offset]} radius={0.011 * size} />
         </group>
       ))}
       <Joint position={layout.shoulder} radius={0.03 * size} />
       <Joint position={layout.elbow} radius={0.035 * size} />
       <Joint position={layout.head} radius={0.03 * size} />
 
-      {/* Shade with a warm glowing inside and bulb */}
+      {/* Shade with a bulb; the inside glows warm when the lamp is on */}
       <group position={layout.head} quaternion={layout.shadeRotation}>
         <mesh position={[0, -0.09 * size, 0]}>
           <cylinderGeometry args={[0.055 * size, 0.06 * size, 0.1 * size, 16]} />
@@ -87,35 +92,40 @@ export default function DeskLamp({ ringRadius, topY, targetY, castShadow }) {
         </mesh>
         <mesh position={[0, -0.2 * size, 0]}>
           <cylinderGeometry args={[0.057 * size, 0.155 * size, 0.135 * size, 20, 1, true]} />
-          <meshStandardMaterial color="#fff1d6" emissive={LIGHT_COLOR} emissiveIntensity={1.6} side={DoubleSide} toneMapped={false} />
+          {on ? (
+            <meshStandardMaterial color="#fff1d6" emissive={LIGHT_COLOR} emissiveIntensity={1.6} side={DoubleSide} toneMapped={false} />
+          ) : (
+            <meshStandardMaterial color="#d8d4ca" roughness={0.6} side={DoubleSide} />
+          )}
         </mesh>
         <mesh position={[0, -0.2 * size, 0]}>
           <sphereGeometry args={[0.045 * size, 12, 10]} />
-          <meshStandardMaterial color="#fff8ea" emissive={LIGHT_COLOR} emissiveIntensity={3} toneMapped={false} />
-        </mesh>
-        {/* Soft glow at the opening */}
-        <mesh position={[0, -0.27 * size, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.2 * size, 20]} />
-          <meshBasicMaterial color={LIGHT_COLOR} transparent opacity={0.25} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
+          {on ? (
+            <meshStandardMaterial color="#fff8ea" emissive={LIGHT_COLOR} emissiveIntensity={3} toneMapped={false} />
+          ) : (
+            <meshStandardMaterial color="#f2efe8" roughness={0.2} />
+          )}
         </mesh>
       </group>
 
-      <primitive object={lightTarget} position={layout.target} />
-      <spotLight
-        position={layout.head}
-        target={lightTarget}
-        color={LIGHT_COLOR}
-        intensity={9 * size}
-        angle={0.55}
-        penumbra={0.7}
-        distance={ringRadius * 6}
-        decay={1.3}
-        castShadow={castShadow}
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0005}
-        shadow-normalBias={0.02}
-        shadow-radius={6}
-      />
+      {on && (
+        <>
+          <primitive object={lightTarget} position={layout.target} />
+          {/* Wide, very soft edge (penumbra 1), so the light fades out on the bench instead of
+              ending in a hard circle. No shadows: they drew hard dark lines across the soil.
+              Stronger for bigger views, so every container gets the same amount of light. */}
+          <spotLight
+            position={layout.bulb}
+            target={lightTarget}
+            color={LIGHT_COLOR}
+            intensity={9 * (r / 1.5) ** 1.3}
+            angle={0.62}
+            penumbra={1}
+            distance={r * 5}
+            decay={1.3}
+          />
+        </>
+      )}
     </group>
   )
 }
