@@ -1,0 +1,375 @@
+/* ---------- Optional login: account button, avatar, menu and sign-in dialog ---------- */
+
+/* Round avatar: the Google picture, or the initials on the primary colour. */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar--medium {
+  width: var(--control-size);
+  height: var(--control-size);
+  font-size: var(--font-size-sm);
+}
+
+.avatar--large {
+  width: 44px;
+  height: 44px;
+  font-size: var(--font-size-md);
+}
+
+.avatar--loading {
+  background: var(--color-surface-sunken);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .avatar--loading {
+    animation: avatar-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes avatar-pulse {
+  50% { opacity: 0.5; }
+}
+
+/* Account menu (signed in). */
+.account-menu {
+  position: relative;
+}
+
+
+
+.account-menu__popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(300px, calc(100vw - 32px));
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), var(--shadow-lg);
+  animation: anim-appear 180ms ease both;
+}
+
+.account-menu__who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.account-menu__who > div {
+  min-width: 0;
+}
+
+.account-menu__name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu__email {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.account-menu__error {
+  color: var(--color-error-text);
+  font-size: var(--font-size-sm);
+}
+
+.account-menu__sign-out {
+  justify-content: center;
+}
+
+/* Sign-in dialog. */
+.sign-in {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sign-in__google {
+  height: 48px;
+  gap: var(--space-3);
+  background: var(--color-surface-raised);
+  font-weight: 600;
+}
+
+.sign-in__divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.sign-in__divider::before,
+.sign-in__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-strong);
+}
+
+.sign-in__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sign-in__sent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  line-height: 1.45;
+}
+
+.sign-in__privacy {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+
+.avatar--xl {
+  width: 72px;
+  height: 72px;
+  font-size: 1.375rem;
+}
+
+/* 3D plant pictures sit on a soft, light background, like the catalogue thumbnails. */
+.avatar--plant {
+  background: radial-gradient(circle at 50% 40%, #fbfcf7 0%, #e3e8d6 100%);
+}
+
+.avatar--plant img {
+  object-fit: contain;
+  padding: 8%;
+}
+
+/* Signed in: avatar and name together in the top bar (only the avatar on phones). */
+.account-menu__toggle {
+  border: 0;
+  transition: box-shadow var(--transition), background-color var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 220px;
+  padding: 0 var(--space-4) 0 0;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .account-menu__toggle:hover {
+    box-shadow: inset 0 0 0 1px var(--color-primary-hover);
+    background: var(--color-primary-soft);
+  }
+}
+
+.account-menu__toggle-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .account-menu__toggle {
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .account-menu__toggle-name {
+    display: none;
+  }
+}
+
+.account-menu__details {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-menu__badge {
+  display: inline-block;
+  margin: var(--space-1) 0 0;
+}
+
+.account-menu__settings {
+  flex: none;
+}
+
+/* Test account card at the top of the sign-in dialog. */
+.sign-in__test {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-selected);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.sign-in__test-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sign-in__test-title {
+  font-weight: 700;
+}
+
+.sign-in__test-note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.sign-in__test-button {
+  flex: none;
+  height: 40px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 480px) {
+  .sign-in__test {
+    flex-wrap: wrap;
+  }
+
+  .sign-in__test-button {
+    width: 100%;
+  }
+}
+
+/* Account settings dialog. */
+.profile-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.profile-settings__preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.profile-settings__preview > div {
+  min-width: 0;
+}
+
+.profile-settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.profile-settings__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.profile-settings__choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px var(--space-4) 4px 4px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.profile-settings__choice .avatar--medium {
+  width: 32px;
+  height: 32px;
+  font-size: 0.6875rem;
+}
+
+.profile-settings__choice.is-selected,
+.profile-settings__plant.is-selected {
+  box-shadow: inset 0 0 0 2px var(--color-confirm);
+  background: var(--color-surface-selected);
+}
+
+.profile-settings__upload-icon {
+  background: var(--color-surface-sunken);
+}
+
+.profile-settings__plants {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: var(--space-2);
+}
+
+.profile-settings__plant {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #fbfcf7 0%, #e3e8d6 100%);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.profile-settings__plant img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .profile-settings__plant:hover,
+  .profile-settings__choice:hover {
+    box-shadow: inset 0 0 0 2px var(--color-primary-hover);
+  }
+}
+
+/* The shared text input grows sideways in a row (save form); in this column it keeps its height. */
+.profile-settings__section .text-input {
+  flex: none;
+}

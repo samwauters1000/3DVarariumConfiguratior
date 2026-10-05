@@ -1,0 +1,399 @@
+/* App shell: top bar, category rail, stage and options panel.
+   Desktop: rail | stage | panel. Tablet: rail | stage, panel below. Mobile: stacked. */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+  height: 100svh;
+  padding: var(--gutter);
+}
+
+/* ---------- Top bar ---------- */
+
+.top-bar {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  height: var(--top-bar-height);
+  padding: 0 var(--space-3) 0 var(--space-6);
+  background: var(--color-panel);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar__brand {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.top-bar__brand-dot {
+  color: var(--color-primary-hover);
+}
+
+.top-bar__title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.top-bar__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* ---------- Workspace grid ---------- */
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--rail-width) minmax(0, 1fr) var(--panel-width);
+  grid-template-areas: 'rail stage panel';
+  gap: var(--gutter);
+}
+
+.category-rail {
+  grid-area: rail;
+}
+
+.stage {
+  grid-area: stage;
+}
+
+.panel {
+  grid-area: panel;
+}
+
+/* ---------- Category rail ---------- */
+
+.category-rail {
+  align-self: center;
+  position: relative;
+  z-index: 2;
+}
+
+.category-rail__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--color-panel);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Stage (3D viewport) ---------- */
+
+.stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-surface);
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(250, 251, 246, 0.95) 0%, rgba(243, 244, 236, 0.6) 55%, rgba(243, 244, 236, 0) 100%),
+    var(--color-surface-sunken);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  isolation: isolate;
+}
+
+.stage__canvas {
+  position: absolute !important;
+  inset: 0;
+  touch-action: none;
+}
+
+.stage__overlay {
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.stage__overlay > * {
+  pointer-events: auto;
+}
+
+.stage__overlay--top {
+  top: var(--space-4);
+  justify-content: flex-start;
+}
+
+.stage__badge--end {
+  margin-left: auto;
+}
+
+.stage__overlay--bottom {
+  bottom: var(--space-4);
+  justify-content: center;
+}
+
+.stage__message,
+.stage__hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 72px var(--space-4) 88px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.stage__notice {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  z-index: 6;
+  max-width: calc(100% - var(--space-8));
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-label);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.stage__hint p {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-label);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+}
+
+/* ---------- Options panel ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-panel);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.panel__header {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  /* Top padding and title line height match the 3D view's top row (16 px inset, 36 px
+     tall controls), so the panel title lines up with the undo / redo and container badge. */
+  padding: var(--space-4) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: var(--overlay-row-height);
+}
+
+.panel__subtitle {
+  margin-top: -2px;
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+.panel__content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+.panel-footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-border);
+}
+
+.panel-footer__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.panel-footer__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* "Back to …" link in the header of the price overview, level with the title. */
+.panel__back {
+  flex: none;
+  height: var(--overlay-row-height);
+}
+
+.panel-footer__total {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-footer__label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.panel-footer__amount {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Tablet: panel moves below the stage ---------- */
+
+@media (max-width: 960px) {
+  .app {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .workspace {
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+    grid-template-areas:
+      'rail stage'
+      'panel panel';
+  }
+
+  .stage {
+    height: 56svh;
+    min-height: 400px;
+  }
+
+  .panel {
+    overflow: visible;
+  }
+
+  .panel__content {
+    overflow: visible;
+  }
+
+  .panel-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    border-radius: 0 0 var(--radius-surface) var(--radius-surface);
+    box-shadow: 0 -8px 16px -12px rgba(45, 53, 41, 0.25);
+  }
+}
+
+/* ---------- Mobile: stacked, rail becomes a horizontal bar ---------- */
+
+@media (max-width: 640px) {
+  .top-bar {
+    padding: 0 var(--space-2) 0 var(--space-4);
+    border-radius: var(--radius-surface);
+  }
+
+  /* The brand on the left already shows the name; hiding the centre title keeps the
+     buttons inside the screen. */
+  .top-bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .top-bar__title {
+    display: none;
+  }
+
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'stage'
+      'rail'
+      'panel';
+  }
+
+  .stage {
+    height: 52svh;
+    min-height: 340px;
+    max-height: 520px;
+    border-radius: var(--radius-surface);
+  }
+
+  .category-rail {
+    align-self: stretch;
+  }
+
+  .category-rail__list {
+    flex-direction: row;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border-radius: var(--radius-surface);
+  }
+
+  .category-rail__list > li {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stage__overlay {
+    left: var(--space-3);
+    right: var(--space-3);
+  }
+
+  .stage__overlay--top {
+    top: var(--space-3);
+  }
+
+  .stage__overlay--bottom {
+    bottom: var(--space-3);
+  }
+
+  .stage__message,
+  .stage__hint {
+    padding: 60px var(--space-3) 76px;
+  }
+
+  .panel {
+    border-radius: var(--radius-surface);
+  }
+
+  .panel__header {
+    padding: var(--space-5) var(--space-4) var(--space-4);
+  }
+
+  .panel__content {
+    padding: var(--space-4);
+  }
+
+  .panel-footer {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border-radius: 0 0 var(--radius-surface) var(--radius-surface);
+  }
+}

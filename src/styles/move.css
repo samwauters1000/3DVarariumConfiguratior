@@ -1,0 +1,165 @@
+/* ---------- Move section in the selected-object panel ---------- */
+
+.move-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.move-controls__main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.move-controls__label {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+
+.move-controls__pick {
+  gap: var(--space-2);
+}
+
+/* Small cross-shaped arrow pad on the right. */
+.move-controls__pad {
+  display: grid;
+  grid-template-areas:
+    '. up .'
+    'left . right'
+    '. down .';
+  grid-template-columns: repeat(3, 26px);
+  grid-template-rows: repeat(3, 26px);
+  margin-left: auto;
+}
+
+.move-controls__arrow {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+  transition: background-color var(--transition);
+}
+
+.move-controls__arrow--up { grid-area: up; }
+.move-controls__arrow--left { grid-area: left; }
+.move-controls__arrow--right { grid-area: right; }
+.move-controls__arrow--down { grid-area: down; }
+
+.move-controls__icon--up { transform: rotate(180deg); }
+.move-controls__icon--left { transform: rotate(90deg); }
+.move-controls__icon--right { transform: rotate(-90deg); }
+
+@media (hover: hover) {
+  .move-controls__arrow:hover {
+    background: var(--color-primary);
+  }
+}
+
+@media (pointer: coarse) {
+  .move-controls__pad {
+    grid-template-columns: repeat(3, 34px);
+    grid-template-rows: repeat(3, 34px);
+  }
+}
+
+.move-controls__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.move-controls__hint.is-blocked {
+  color: var(--color-warning-text);
+}
+
+/* ---------- Object toolbar in narrow 3D views ----------
+   The toolbar above a selected object is kept inside the 3D view (ClampToStage). When the
+   view itself is narrow (phones, small tablets), it also gets compact: the name is hidden
+   (it is shown in the panel) and the buttons are a little smaller, so it always fits. */
+
+.stage {
+  container-type: inline-size;
+  container-name: stage;
+}
+
+.clamp-to-stage {
+  will-change: transform;
+}
+
+@container stage (max-width: 520px) {
+  .scene-toolbar {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .scene-toolbar__name {
+    display: none;
+  }
+
+  .scene-toolbar__button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .scene-toolbar__divider {
+    margin: 0 1px;
+  }
+}
+
+@container stage (max-width: 340px) {
+  .scene-toolbar__button {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* ---------- "Pick a new spot" notice over the 3D view (frosted glass) ---------- */
+
+.stage__picking {
+  position: absolute;
+  top: calc(var(--space-4) + var(--overlay-row-height) + var(--space-3));
+  left: 50%;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: calc(100% - var(--space-8));
+  margin: 0;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border-radius: var(--radius-label);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  transform: translateX(-50%);
+}
+
+.stage__picking-cancel {
+  color: var(--color-text);
+}
+
+.stage__picking.is-blocked {
+  background: rgba(244, 233, 191, 0.78);
+  color: var(--color-warning-text);
+}
+
+.stage.is-night .stage__picking {
+  background: rgba(28, 33, 29, 0.55);
+  color: var(--color-text-inverse);
+  box-shadow: inset 0 0 0 1px var(--glass-dark-edge), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.stage.is-night .stage__picking-cancel {
+  color: var(--color-text-inverse);
+}

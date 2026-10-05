@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2f432b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Terrarium icon in the darkest green of the palette (#2f432b, --color-text / --color-dark) -->
+  <path d="M6 18V11a6 6 0 0 1 12 0v7" />
+  <path d="M4 18h16v2H4z" fill="#2f432b" />
+  <path d="M12 5V3" />
+</svg>

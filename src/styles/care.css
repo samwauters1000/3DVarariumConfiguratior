@@ -1,0 +1,186 @@
+/* ---------- Care tips (whole-terrarium advice at the top of the panel) ---------- */
+
+.care-tips {
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+}
+
+.care-tips--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.care-tips__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.care-tips__title {
+  flex: 1;
+}
+
+.care-tips--warning .section-label__count {
+  background: rgba(94, 77, 18, 0.12);
+  color: inherit;
+}
+
+.care-tips__chevron {
+  transform: rotate(-90deg);
+  transition: transform var(--transition);
+}
+
+.care-tips.is-open .care-tips__chevron {
+  transform: rotate(0deg);
+}
+
+.care-tips__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  list-style: none;
+}
+
+.care-tips__item {
+  position: relative;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.care-tips__item::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.care-tips__item--warning::before {
+  opacity: 1;
+}
+
+/* ---------- Care details (catalogue info panel + selected item) ---------- */
+
+.care-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.care-details__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+}
+
+.care-details__fact dt {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.care-details__fact dd {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.care-details__fact--wide {
+  grid-column: 1 / -1;
+}
+
+.care-details__tip {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+/* Info + add buttons side by side on catalogue cards. */
+.option-card__buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-button--quiet {
+  background: transparent;
+  color: var(--color-text-muted);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+}
+
+.icon-button--quiet.is-active {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.option-card--rare .icon-button--quiet {
+  color: var(--color-rare-muted);
+  box-shadow: inset 0 0 0 1px rgba(243, 244, 236, 0.25);
+}
+
+.option-card--rare .icon-button--quiet.is-active {
+  background: rgba(243, 244, 236, 0.14);
+  color: var(--color-rare-text);
+}
+
+/* Care panel that unfolds under a catalogue card. */
+.care-panel {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.option-card--rare + .care-panel {
+  box-shadow: inset 0 0 0 1px var(--color-rare);
+}
+
+/* ---------- View controls (night mode, save picture) ---------- */
+
+.stage__view-controls {
+  flex: none;
+  margin-left: auto;
+}
+
+.history-controls__button.is-active {
+  background: var(--color-dark);
+  color: var(--color-text-inverse);
+}
+
+/* Selected-item panel opened under its own catalogue card. */
+.selected-plant--inline {
+  margin-top: var(--space-2);
+}
+
+/* Care block in the selected-item panel. */
+.selected-care {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

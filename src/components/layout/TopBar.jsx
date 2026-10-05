@@ -1,0 +1,36 @@
+import Icon from '../common/Icon.jsx'
+import AccountButton from '../auth/AccountButton.jsx'
+import { useConfigurator, initialConfiguration } from '../../hooks/useConfigurator.jsx'
+
+export default function TopBar({ onOpenSavedDesigns }) {
+  const { configuration, resetConfiguration } = useConfigurator()
+  const isEmpty = configuration === initialConfiguration
+
+  return (
+    <header className="top-bar">
+      <div className="top-bar__brand">
+        Vararium
+      </div>
+      <h1 className="top-bar__title">Vararium Configurator</h1>
+      <div className="top-bar__actions">
+        <button type="button" className="button button--ghost" data-anim="pop" onClick={onOpenSavedDesigns} title="Saved designs">
+          <Icon name="bookmark" size={18} />
+          <span className="button__label">Saved designs</span>
+        </button>
+        <button
+          type="button"
+          className="button button--ghost"
+          data-anim="spin-back"
+          onClick={resetConfiguration}
+          disabled={isEmpty}
+          title="Start over (can be undone)"
+        >
+          <Icon name="rotateLeft" size={18} />
+          <span className="button__label">Start over</span>
+        </button>
+        {/* Optional login: "Sign in", or a round avatar with a menu when signed in. */}
+        <AccountButton />
+      </div>
+    </header>
+  )
+}
