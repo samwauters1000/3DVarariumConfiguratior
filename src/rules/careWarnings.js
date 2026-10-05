@@ -7,7 +7,8 @@ import { findLid, getLights } from '../data/equipment.js'
 // or animals. Unlike the hard rules (ground, size, room) these never block anything; they
 // are shown as tips in the options panel, the summary and the PDF.
 //
-// Each warning: { id, tone: 'warning' | 'info', text }.
+// Each warning: { id, section, tone: 'warning' | 'info', text }. section is where it can be
+// fixed (a section id), used for the warning dot on the section buttons.
 
 // Clean-up crew: small animals that live happily alongside others.
 const CLEAN_UP_CREW = new Set(['animal-isopods', 'animal-springtails', 'animal-snail'])
@@ -34,6 +35,7 @@ export function getCareWarnings(configuration) {
   if (!isClosed && climbers.length > 0) {
     warnings.push({
       id: 'escape',
+      section: 'equipment',
       tone: 'warning',
       text: `The ${terrarium.name} is open: the ${names(climbers)} could escape. Add a lid under Lights.`,
     })
@@ -44,6 +46,7 @@ export function getCareWarnings(configuration) {
   if (needHide.length > 0 && !decorationItems.some((item) => item.hide)) {
     warnings.push({
       id: 'hide',
+      section: 'decoration',
       tone: 'warning',
       text: `The ${names(needHide)} ${unique(needHide).length === 1 ? 'needs' : 'need'} a hiding place, like a Coconut Hide, Cork Tube or Mossy Log.`,
     })
@@ -55,13 +58,14 @@ export function getCareWarnings(configuration) {
   if (loner && housemates.length > 1) {
     warnings.push({
       id: 'solitary',
+      section: 'animals',
       tone: 'warning',
       text: `The ${loner.name} prefers to live alone. Keep it apart from the ${names(housemates.filter((item) => item.id !== loner.id))}.`,
     })
   } else {
     const predators = housemates.filter((item) => animalCare[item.id]?.predator)
     if (predators.length > 1) {
-      warnings.push({ id: 'predators', tone: 'warning', text: `The ${names(predators)} may stress or eat each other. Choose one of them.` })
+      warnings.push({ id: 'predators', section: 'animals', tone: 'warning', text: `The ${names(predators)} may stress or eat each other. Choose one of them.` })
     }
   }
 
@@ -70,6 +74,7 @@ export function getCareWarnings(configuration) {
   if (needUvb.length > 0 && !getLights(configuration.lights).some((light) => light.uvb)) {
     warnings.push({
       id: 'uvb',
+      section: 'equipment',
       tone: 'warning',
       text: `The ${names(needUvb)} needs a UVB T5 Tube (Lights). It only fits the Panorama Tank.`,
     })
@@ -81,6 +86,7 @@ export function getCareWarnings(configuration) {
   if (humidAnimals.length > 0 && dryPlants.length > 0) {
     warnings.push({
       id: 'humidity',
+      section: 'animals',
       tone: 'warning',
       text: `The ${names(humidAnimals)} ${unique(humidAnimals).length === 1 ? 'needs' : 'need'} humid air, but the ${names(dryPlants)} ${unique(dryPlants).length === 1 ? 'prefers' : 'prefer'} it dry.`,
     })
@@ -91,6 +97,7 @@ export function getCareWarnings(configuration) {
   if ((!isClosed || lid?.ventilated) && humidPlants.length > 0) {
     warnings.push({
       id: 'dry-air',
+      section: 'equipment',
       tone: 'info',
       text: `${lid?.ventilated ? 'With a mesh lid' : 'Without a lid'}, humidity-loving plants like the ${names(humidPlants.slice(0, 2))} dry out faster. Mist them often.`,
     })
@@ -99,6 +106,7 @@ export function getCareWarnings(configuration) {
   if (brightPlants.length > 0 && !hasGrowLight) {
     warnings.push({
       id: 'light',
+      section: 'equipment',
       tone: 'info',
       text: `The ${names(brightPlants.slice(0, 2))} ${brightPlants.length === 1 ? 'grows' : 'grow'} best in bright light: place it near a window or add an LED Grow Light.`,
     })

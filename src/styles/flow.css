@@ -335,3 +335,175 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* ---------- R6: guidance over the 3D view ---------- */
+
+/* Step hint: under the top row, centred (same place as the "pick a spot" notice). */
+.stage__step-hint {
+  position: absolute;
+  top: calc(var(--space-4) + var(--overlay-row-height) + var(--space-3));
+  left: 50%;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: max-content;
+  max-width: calc(100% - var(--space-8));
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-label);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  line-height: 1.35;
+  transform: translateX(-50%);
+}
+
+.stage__step-hint .icon {
+  color: var(--color-confirm);
+}
+
+/* One tip at a time: a small frosted note above the camera toolbar. */
+.stage__tip {
+  position: absolute;
+  bottom: calc(var(--space-4) + 56px + var(--space-3));
+  left: 50%;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: max-content;
+  max-width: calc(100% - var(--space-8));
+  padding: 6px 6px 6px var(--space-4);
+  border-radius: var(--radius-label);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), var(--glass-shadow);
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  transform: translateX(-50%);
+}
+
+.stage__tip-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+}
+
+@media (hover: hover) {
+  .stage__tip-close:hover {
+    background: var(--color-primary-soft);
+  }
+}
+
+.stage.is-night .stage__step-hint,
+.stage.is-night .stage__tip {
+  background: rgba(28, 33, 29, 0.55);
+  color: var(--color-text-inverse);
+  box-shadow: inset 0 0 0 1px var(--glass-dark-edge), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.stage.is-night .stage__step-hint .icon {
+  color: var(--color-primary);
+}
+
+@container stage (max-width: 520px) {
+  .stage__step-hint {
+    font-size: var(--font-size-sm);
+  }
+
+  .stage__tip {
+    bottom: calc(var(--space-3) + 56px + var(--space-2));
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stage__step-hint,
+  .stage__tip {
+    animation: guidance-in 260ms ease both;
+  }
+}
+
+@keyframes guidance-in {
+  from { opacity: 0; margin-top: 4px; }
+  to { opacity: 1; margin-top: 0; }
+}
+
+/* ---------- R9: care warnings ---------- */
+
+/* A small orange dot on the section that has a care warning. */
+.section-nav__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.section-nav__warning {
+  position: absolute;
+  top: -3px;
+  right: -6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d98a2b;
+  box-shadow: 0 0 0 2px var(--color-surface-sunken);
+}
+
+.section-nav__button.is-active .section-nav__warning {
+  box-shadow: 0 0 0 2px var(--color-dark);
+}
+
+/* Care warnings and tips at the end of the receipt. */
+.receipt__care {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+.receipt__care-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.receipt__care-item {
+  position: relative;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.receipt__care-item::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.receipt__care-item--warning::before {
+  background: #d98a2b;
+  opacity: 1;
+}

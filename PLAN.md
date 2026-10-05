@@ -252,7 +252,14 @@ Method: an expert review against Nielsen's 10 heuristics, plus a first-time-user
 - **R7 Keep or share it:** the summary shows Save design (opens Saved designs) and Copy link right under the preview picture, next to Download PDF.
 - **R8 Fill for me:** when it cannot be used, the reason is shown as text in the banner instead of only on hover.
 
-Still open: R4 (progress ticks on the section buttons), R6 (smarter first-visit tips), R9 (care warnings visible from every section).
+**Feedback on these fixes:** R2, R3, R7 and R8 are good. R1 is a start but not liked yet; it stays for now and will be revisited later (the other ideas, a glowing next section, a "Continue" pill or moving on automatically, were not liked either). R5 will be checked on a real phone and tablet later.
+
+**Decided after that:**
+- **R4 dropped:** no progress bar, ticks or similar. A configurator is not a game with collected items; the flow has to be clear without it.
+- **R6 fixed** (`components/layout/GuidanceHints.jsx`; the old tips box is removed):
+  - **Step hint** at the top of the 3D view while the basics are missing: "Choose a container to begin" (centre, empty bench), then "Next, choose a ground layer…", then "Now add a plant: click one in the list…" (touch: "press + on one in the list"). It disappears once there is a plant, and while "Pick a new spot" is active.
+  - **One tip at a time**, small, above the camera toolbar, only when useful: "Drag the 3D view to turn it, scroll to zoom" once there is a terrarium, and "Drag it to move it…" when an item is selected. A tip disappears for good once the person has done it (turned the view; moved, turned or resized the item) or closes it with ×. Done tips are remembered in this browser (`vararium:tips-done`).
+- **R9 fixed:** a section with a care warning gets a small orange dot on its section button (each warning knows the section where it is fixed, `section` in `rules/careWarnings.js`). Hovering shows the warning; tapping opens the section, where the care box lists it. The summary shows the warnings and tips at the end of the receipt ("Before you build"), and the PDF care sheet still lists them too.
 
 What already works well: real-time price, undo/redo plus Start over, clear disabled reasons on each card, care warnings with concrete advice, consistent visual language, and the new card order (title, section buttons, heading, description, selection).
 
@@ -275,7 +282,7 @@ What already works well: real-time price, undo/redo plus Start over, clear disab
   - **Pre-rendered images:** `npm run thumbnails` (`scripts/generate-thumbnails.mjs`) starts a Vite dev server, opens the app in headless Chrome and renders every plant, decoration item and animal with the app's own renderer. It saves small WebP files (`public/thumbnails/<category>/<id>.webp`, about 2–5 KB each, 61 files ≈ 150 KB) and a list of them with a cache-busting version (`src/data/thumbnails.generated.js`). Phones and tablets just load these images, with no extra 3D work or GPU memory.
   - **Live fallback:** an item without an image yet (for example a newly added plant before the script is run again) is rendered live on desktop by one small hidden canvas (`scene/thumbnails/thumbnailRenderer.jsx`); phones and tablets show the icon for that item.
   - **Run `npm run thumbnails` again after changing or adding models.**
-- **First-visit tips** (`components/layout/OnboardingHints.jsx`): three short tips over the 3D view once a terrarium is chosen (rotate / zoom, adding plants, editing items), worded for mouse or touch. "Got it" hides them for good in this browser.
+- **Guidance over the 3D view** (`components/layout/GuidanceHints.jsx`): a step hint for the basics (container, ground, first plant) and one tip at a time when it is useful; see review finding R6 below. It replaced the first-visit tips box.
 - **Fill for me** (`rules/autoFill.js`, "Not sure where to start?" banner at the top of the Plants panel): replaces what is inside the terrarium with a complete, matching setup, in one undo step.
   - It first clears all plants, decoration, animals, the lid and the lights (`clearContents`); the container and ground stay. So pressing it again gives a fresh setup instead of stacking items on top of each other or going over the limits.
   - When the terrarium already has something in it, the banner says so ("Replaces what is in your terrarium now"), and undo brings the previous design back.

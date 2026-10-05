@@ -5,7 +5,7 @@ import Icon from '../common/Icon.jsx'
 import CameraToolbar from '../controls/CameraToolbar.jsx'
 import HistoryControls from '../controls/HistoryControls.jsx'
 import ViewControls from '../controls/ViewControls.jsx'
-import OnboardingHints from './OnboardingHints.jsx'
+import GuidanceHints from './GuidanceHints.jsx'
 import SceneErrorBoundary from '../../scene/SceneErrorBoundary.jsx'
 import { getView, resetCamera, rotateCamera, zoomCamera } from '../../scene/cameraSettings.js'
 import { findTerrarium } from '../../data/catalogue.js'
@@ -54,13 +54,8 @@ export default function Stage() {
         </p>
       )}
 
-      {!terrarium && (
-        <div className="stage__hint">
-          <p>Choose a terrarium to begin.</p>
-        </div>
-      )}
-
-      {terrarium && <OnboardingHints />}
+      {/* Step hint, and one useful tip at a time (review finding R6). */}
+      <GuidanceHints />
 
       {pickedItem && (
         <p className={`stage__picking${pickingSpot.blocked ? ' is-blocked' : ''}`} role="status">

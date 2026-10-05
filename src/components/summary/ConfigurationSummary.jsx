@@ -120,23 +120,23 @@ export default function ConfigurationSummary({ summary, onClose, onSaveDesign })
           <span>Total</span>
           <span>{formatPrice(summary.total)}</span>
         </div>
-      </article>
 
-      {summary.careWarnings?.length > 0 && (
-        <section className="care-tips is-open" aria-label="Care tips">
-          <p className="care-tips__toggle">
-            <Icon name="info" size={16} />
-            <span className="care-tips__title">Before you build</span>
-          </p>
-          <ul className="care-tips__list">
-            {summary.careWarnings.map((warning) => (
-              <li key={warning.id} className={`care-tips__item care-tips__item--${warning.tone}`}>
-                {warning.text}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        {/* Care warnings and tips at the end of the receipt (review finding R9). */}
+        {summary.careWarnings?.length > 0 && (
+          <section className="receipt__care" aria-labelledby="receipt-care-title">
+            <h3 id="receipt-care-title" className="section-label section-label--caps">
+              Before you build
+            </h3>
+            <ul className="receipt__care-list">
+              {summary.careWarnings.map((warning) => (
+                <li key={warning.id} className={`receipt__care-item receipt__care-item--${warning.tone}`}>
+                  {warning.text}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </article>
       {summary.careSheet?.length > 0 && (
         <p className="section-note">The PDF includes a care sheet for every plant and animal.</p>
       )}
