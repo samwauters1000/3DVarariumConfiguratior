@@ -5,9 +5,50 @@ import Dialog from '../common/Dialog.jsx'
 import { formatPrice } from '../../utils/pricing.js'
 import { formatDate } from '../../utils/summary.js'
 import { exportConfigurationPdf } from '../../utils/pdf.js'
+import { createShareLink } from '../../utils/shareLink.js'
+import { useConfigurator } from '../../hooks/useConfigurator.jsx'
+
+// After finishing, people want to keep or share their design (review finding R7), so the
+// summary offers that next to the PDF.
+function KeepOrShare({ onSaveDesign }) {
+  const { configuration } = useConfigurator()
+  const [share, setShare] = useState({ status: 'idle', link: '' })
+
+  const handleCopy = async () => {
+    const link = createShareLink(configuration)
+    try {
+      await navigator.clipboard.writeText(link)
+      setShare({ status: 'copied', link })
+    } catch {
+      setShare({ status: 'manual', link })
+    }
+  }
+
+  return (
+    <section className="keep-share" aria-labelledby="keep-share-title">
+      <div>
+        <h3 id="keep-share-title" className="section-label">Keep or share it</h3>
+        <p className="section-note">Save it to come back later, or send a link that shows exactly this terrarium.</p>
+      </div>
+      <div className="keep-share__actions">
+        <button type="button" className="button button--ghost" data-anim="pop" onClick={onSaveDesign}>
+          <Icon name="bookmark" size={18} />
+          Save design
+        </button>
+        <button type="button" className="button button--ghost" data-anim="pop" onClick={handleCopy}>
+          <Icon name={share.status === 'copied' ? 'check' : 'share'} size={18} />
+          {share.status === 'copied' ? 'Link copied' : 'Copy link'}
+        </button>
+      </div>
+      {share.status === 'manual' && (
+        <input className="text-input" readOnly value={share.link} onFocus={(event) => event.target.select()} aria-label="Share link" />
+      )}
+    </section>
+  )
+}
 
 // Receipt-style review of the confirmed configuration.
-export default function ConfigurationSummary({ summary, onClose }) {
+export default function ConfigurationSummary({ summary, onClose, onSaveDesign }) {
   const [exportState, setExportState] = useState('idle')
 
   const handleExport = async () => {
@@ -24,7 +65,7 @@ export default function ConfigurationSummary({ summary, onClose }) {
   return (
     <Dialog
       title="Your terrarium"
-      subtitle="Review your configuration before downloading it."
+      subtitle="Review your terrarium, then download, save or share it."
       closeLabel="Close summary"
       onClose={onClose}
       footer={
@@ -44,6 +85,9 @@ export default function ConfigurationSummary({ summary, onClose }) {
           <img src={summary.previewImage.src} alt={`3D preview of the configured ${summary.terrariumName}`} />
         </figure>
       )}
+
+      {/* Visible straight away, without scrolling past the receipt. */}
+      <KeepOrShare onSaveDesign={onSaveDesign} />
 
       <article className="receipt" aria-label="Configuration receipt">
         <div className="receipt__head">

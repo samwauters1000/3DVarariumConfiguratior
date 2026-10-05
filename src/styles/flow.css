@@ -208,3 +208,130 @@
     margin: 0 calc(var(--space-2) - var(--space-4));
   }
 }
+
+/* ---------- Flow fixes from the expert review (R1, R2, R3, R7, R8) ---------- */
+
+/* R2: Required / Optional next to the section heading. */
+.panel__intro-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.panel__requirement {
+  padding: 2px 9px;
+  border-radius: var(--radius-label);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.panel__requirement.is-required {
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+}
+
+/* R1: the next step, a text link under the selection (not an extra button). */
+.panel__next {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  margin-top: var(--space-2);
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-confirm);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.panel__next-optional {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.panel__next-arrow {
+  transform: rotate(-90deg);
+}
+
+@media (hover: hover) {
+  .panel__next:hover {
+    color: var(--color-text);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel__next:hover .panel__next-arrow {
+    transform: rotate(-90deg) translateY(2px);
+    transition: transform var(--transition);
+  }
+}
+
+.panel__next--finish {
+  gap: var(--space-2);
+  color: var(--color-success-text);
+  text-decoration: none;
+  cursor: default;
+}
+
+/* R3: one message instead of a wall of unavailable options. */
+.missing-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-selected);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+.missing-step__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-panel);
+}
+
+.missing-step__title {
+  font-weight: 700;
+}
+
+.missing-step__reason {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.missing-step__button {
+  grid-column: 1 / -1;
+  height: 44px;
+}
+
+/* R8: why "Fill for me" cannot be used, as visible text. */
+.fill-banner__reason {
+  margin-top: var(--space-1);
+  color: var(--color-warning-text);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+/* R7: keep or share the design from the summary. */
+.keep-share {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.keep-share__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

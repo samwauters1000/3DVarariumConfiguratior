@@ -229,7 +229,7 @@ Feedback from tests with real people, and what was done (`styles/flow.css`):
 
 ### Expert UX review (for point 5, the overall flow)
 
-Method: an expert review against Nielsen's 10 heuristics, plus a first-time-user walkthrough of one task ("design a terrarium for a dart frog") on desktop (1440 px) and phone (390 px), with no saved state. Severity: 4 = blocks or misleads people, 3 = major, 2 = minor, 1 = cosmetic. All findings are open.
+Method: an expert review against Nielsen's 10 heuristics, plus a first-time-user walkthrough of one task ("design a terrarium for a dart frog") on desktop (1440 px) and phone (390 px), with no saved state. Severity: 4 = blocks or misleads people, 3 = major, 2 = minor, 1 = cosmetic. Shareable report page: https://claude.ai/artifact/QLsWMUq6HLqrext4joSSMi (private until shared from its Share menu).
 
 | # | Finding | Heuristic | Severity |
 |---|---|---|---|
@@ -242,6 +242,17 @@ Method: an expert review against Nielsen's 10 heuristics, plus a first-time-user
 | R7 | The summary is a dead end besides "Download PDF": no Save design or Copy link, which are the natural next steps after finishing. | User control and freedom | 2 |
 | R8 | "Fill for me" is disabled before a ground is chosen, and the reason is only in a tooltip (invisible on touch). | Visibility; help users recover | 2 |
 | R9 | Care warnings only show inside the Plants, Decoration, Lights and Animals panels; a warning made in one section is easy to miss from another. | Visibility of system status | 2 |
+
+**Fixed (flow rules in `rules/flowRules.js`, tested in `tests/flow.test.js`):**
+
+- **R1 Next step:** under the selection, a text link points to the next section ("Next: choose a ground ›"). It appears once a required choice is made; optional sections show "Skip: choose lights (optional)". On the last section, when everything required is in, it says "Everything you need is in. Press Confirm below to review your terrarium." It is text, not an extra button, and Confirm is unchanged. If the next section cannot be used yet, it points to the missing step instead.
+- **R2 Required or optional:** every section heading has a "Required" or "Optional" label (container, ground and plants are required). An empty optional section says "Nothing added yet · you can skip this".
+- **R3 Choose this first:** a section that cannot be used yet shows one message instead of a list of unavailable options: "First choose a container / ground", the reason, and a button that opens that section. Plants, decoration and animals need a container and a ground; lights need a container.
+- **R5 Phones:** after choosing another section, the page scrolls so the options card (heading and options) is at the top of the screen; not on the first view, so the app still opens on the 3D view. A newly added item's panel is scrolled into view when it was added from the list (not when selected in the 3D view).
+- **R7 Keep or share it:** the summary shows Save design (opens Saved designs) and Copy link right under the preview picture, next to Download PDF.
+- **R8 Fill for me:** when it cannot be used, the reason is shown as text in the banner instead of only on hover.
+
+Still open: R4 (progress ticks on the section buttons), R6 (smarter first-visit tips), R9 (care warnings visible from every section).
 
 What already works well: real-time price, undo/redo plus Start over, clear disabled reasons on each card, care warnings with concrete advice, consistent visual language, and the new card order (title, section buttons, heading, description, selection).
 

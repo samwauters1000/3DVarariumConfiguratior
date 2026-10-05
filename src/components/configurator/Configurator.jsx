@@ -101,7 +101,16 @@ export default function Configurator() {
         />
       </main>
       <DragGhost />
-      {summary && <ConfigurationSummary summary={summary} onClose={closeSummary} />}
+      {summary && (
+        <ConfigurationSummary
+          summary={summary}
+          onClose={closeSummary}
+          onSaveDesign={() => {
+            setSummary(null)
+            setIsSavedDesignsOpen(true)
+          }}
+        />
+      )}
       {isSavedDesignsOpen && <SavedDesignsDialog onClose={closeSavedDesigns} />}
     </div>
   )

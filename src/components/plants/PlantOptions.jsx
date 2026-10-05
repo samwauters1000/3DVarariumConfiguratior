@@ -59,6 +59,13 @@ export default function PlantOptions() {
             A complete setup: plants, decoration and lights{includeAnimal ? ', plus an animal if one fits' : ''}.
             {hasContents(configuration) && ' Replaces what is in your terrarium now (undo brings it back).'}
           </p>
+          {!canFill && (
+            <p className="fill-banner__reason" role="status">
+              {ground
+                ? `Nothing in the catalogue fits this container with . Try another ground or container.`
+                : 'Choose a ground first: it decides which plants can grow.'}
+            </p>
+          )}
           <label className="fill-banner__option">
             <input type="checkbox" checked={includeAnimal} onChange={(event) => setIncludeAnimal(event.target.checked)} />
             Include an animal
@@ -70,7 +77,7 @@ export default function PlantOptions() {
           data-anim="twinkle"
           onClick={() => fillDesign({ includeAnimal })}
           disabled={!canFill}
-          title={canFill ? 'Add a complete, matching setup' : 'Choose a ground first, or make room'}
+          title={canFill ? 'Add a complete, matching setup' : undefined}
         >
           <Icon name="sparkle" size={16} />
           Fill for me

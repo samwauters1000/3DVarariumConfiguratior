@@ -23,15 +23,23 @@ export default function SelectedObject({ categoryId }) {
   // Bring the panel into view when another object is selected (it opens under that
   // object's catalogue card, which may be further down the list). Only for a new selection:
   // opening a category while something is still selected must not jump down the page.
-  // Only when the panel scrolls on its own (desktop); on mobile the page would jump away
-  // from the 3D view.
+  // On phones (the page scrolls) only when the item's catalogue card is on screen, i.e. the
+  // item was just added from the list (review finding R5); selecting something in the 3D
+  // view must not jump the page away from it.
   useEffect(() => {
     if (!selectedId || selectedId === lastRevealedSelection) return
     lastRevealedSelection = selectedId
     const section = sectionRef.current
     const scroller = section?.closest('.panel__content')
-    if (!scroller || getComputedStyle(scroller).overflowY !== 'auto') return
-    section.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    if (!section || !scroller) return
+    if (getComputedStyle(scroller).overflowY === 'auto') {
+      section.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      return
+    }
+    const card = section.previousElementSibling
+    const cardBox = card?.getBoundingClientRect()
+    const cardOnScreen = cardBox && cardBox.bottom > 0 && cardBox.top < window.innerHeight
+    if (cardOnScreen) section.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [selectedId])
 
   if (!selectedId) return null
