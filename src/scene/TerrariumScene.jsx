@@ -11,7 +11,7 @@ import PlacementSystem from './PlacementSystem.jsx'
 import Equipment from './equipment/Equipment.jsx'
 import Workbench from './Workbench.jsx'
 import DeskLamp from './DeskLamp.jsx'
-import { CAMERA_SETTINGS, getDefaultCameraPosition, getView } from './cameraSettings.js'
+import { CAMERA_SETTINGS, getCmPerUnit, getDefaultCameraPosition, getView } from './cameraSettings.js'
 import { findGround, findTerrarium } from '../data/catalogue.js'
 import { useConfigurator } from '../hooks/useConfigurator.jsx'
 import { useSceneApi } from '../hooks/useSceneApi.jsx'
@@ -99,10 +99,10 @@ function ShadowSetup() {
 
 // The terrarium stands on a wooden potting bench (3DWorkkbench.jpg), with the 360° ring
 // from the layout moodboard on top of it.
-function Floor({ ringRadius, shadowScale, mode }) {
+function Floor({ ringRadius, cmPerUnit, shadowScale, mode }) {
   return (
     <>
-      <Workbench ringRadius={ringRadius} />
+      <Workbench cmPerUnit={cmPerUnit} />
       {/* The 360° ring from the layout moodboard. */}
       <mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[ringRadius, ringRadius + ringRadius * 0.014, 128]} />
@@ -175,8 +175,8 @@ export default function TerrariumScene() {
           otherwise it turns white once the depth effect is applied. */}
       <color attach="background" args={[mode.background]} />
       <Lighting shadowMapSize={quality.shadowMapSize} mode={mode} />
-      <Floor ringRadius={view.ringRadius} shadowScale={view.ringRadius * 3.3} mode={mode} />
-      <DeskLamp ringRadius={view.ringRadius} on={nightMode} />
+      <Floor ringRadius={view.ringRadius} cmPerUnit={getCmPerUnit(terrarium)} shadowScale={view.ringRadius * 3.3} mode={mode} />
+      <DeskLamp cmPerUnit={getCmPerUnit(terrarium)} on={nightMode} />
       <CameraControls controlsRef={controlsRef} terrarium={terrarium} />
       <ShadowSetup />
       <SceneBridge terrarium={terrarium} />

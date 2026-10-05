@@ -3,8 +3,8 @@ import { DoubleSide, Object3D, Quaternion, Vector3 } from 'three'
 
 // A black architect's desk lamp (DarkModeLamp.jpg) always stands on the workbench, at one
 // fixed spot at the back right: it does not move when another container is chosen. Like the
-// bench, it is sized to the camera view (`ringRadius`), so it looks the same next to every
-// container. By day it is off; in night mode it is on and lights the terrarium you are
+// bench, it has a fixed real size in cm, converted to the container's scene units
+// (`cmPerUnit`). By day it is off; in night mode it is on and lights the terrarium you are
 // building, while the rest of the room stays dark.
 
 const UP = new Vector3(0, 1, 0)
@@ -41,23 +41,30 @@ function Joint({ position, radius }) {
   )
 }
 
-export default function DeskLamp({ ringRadius: r, on }) {
-  const size = r * 0.45
+export default function DeskLamp({ cmPerUnit, on }) {
+  // A compact desk lamp, real sizes in cm: a 17 cm base, two arms of 25 and 30 cm, a 12 cm
+  // wide shade, its head about 35 cm up.
+  const cm = (value) => value / cmPerUnit
+  const size = cm(38)
   const layout = useMemo(() => {
-    // Base in the back-right corner of the bench, arms up and back, head just outside the
-    // 360° ring (so it never touches a container) and aimed at the middle of the terrarium.
-    const base = [r * 1.25, 0, -r * 1.1]
-    const shoulder = [base[0], 0.08 * size, base[2]]
-    const elbow = [r * 1.35, r * 0.8, -r * 1.3]
-    const head = [r * 0.85, r * 1.05, -r * 0.85]
-    const target = [0, r * 0.25, 0]
+    const point = (x, y, z) => [cm(x), cm(y), cm(z)]
+    // Base at the back right of the bench, just behind the biggest container (the 90 × 45 cm
+    // Panorama Tank), so it stays in view next to smaller ones too. The head is just above the
+    // tallest round container (32 cm) and behind it, aimed at the middle of the soil; behind
+    // the big tank it shines in through the back glass.
+    const base = point(36, 0, -36)
+    const shoulder = point(36, 3, -36)
+    const elbow = point(40, 26, -46)
+    const head = point(14, 34, -32)
+    const target = point(0, 8, 0)
     const direction = new Vector3(target[0] - head[0], target[1] - head[1], target[2] - head[2]).normalize()
     // The shade opens along -y, turned to face the terrarium.
     const shadeRotation = new Quaternion().setFromUnitVectors(DOWN, direction)
     // The light sits at the bulb, inside the shade.
-    const bulb = direction.clone().multiplyScalar(0.2 * size).add(new Vector3(...head)).toArray()
-    return { base, shoulder, elbow, head, target, shadeRotation, bulb }
-  }, [r, size])
+    const bulbVector = direction.clone().multiplyScalar(0.2 * size).add(new Vector3(...head))
+    const reach = bulbVector.distanceTo(new Vector3(...target))
+    return { base, shoulder, elbow, head, target, shadeRotation, bulb: bulbVector.toArray(), reach }
+  }, [cmPerUnit]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const lightTarget = useMemo(() => new Object3D(), [])
   const offset = 0.02 * size
@@ -113,15 +120,16 @@ export default function DeskLamp({ ringRadius: r, on }) {
           <primitive object={lightTarget} position={layout.target} />
           {/* Wide, very soft edge (penumbra 1), so the light fades out on the bench instead of
               ending in a hard circle. No shadows: they drew hard dark lines across the soil.
-              Stronger for bigger views, so every container gets the same amount of light. */}
+              The strength follows the distance in scene units, so every container gets the same
+              amount of light. */}
           <spotLight
             position={layout.bulb}
             target={lightTarget}
             color={LIGHT_COLOR}
-            intensity={9 * (r / 1.5) ** 1.3}
-            angle={0.62}
+            intensity={9 * (layout.reach / 2.4) ** 1.3}
+            angle={0.75}
             penumbra={1}
-            distance={r * 5}
+            distance={layout.reach * 3}
             decay={1.3}
           />
         </>

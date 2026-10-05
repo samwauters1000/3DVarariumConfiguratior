@@ -2,9 +2,10 @@ import { useMemo } from 'react'
 import { DoubleSide } from 'three'
 
 // The terrarium stands on a wooden potting bench (3DWorkkbench.jpg): a low-poly plank top
-// with legs and a lower shelf, and a few terracotta pots and a trowel at the back. Sized to
-// the container (`ringRadius` of its camera view), so small and large containers both sit
-// nicely on it.
+// with legs and a lower shelf, a few terracotta pots and a trowel. It has a fixed real size
+// (150 × 90 cm top, 80 cm legs; pots 14 cm across), converted to the container's scene units
+// (`cmPerUnit`), so every container stands on it at its real size: a tiny bottle looks tiny
+// next to the pots, the 90 cm Panorama Tank takes up most of the bench.
 
 const WOOD = ['#9a7452', '#8f6b4b', '#a47d59', '#937050', '#9d7654']
 const TERRACOTTA = '#c4693f'
@@ -61,13 +62,14 @@ function Trowel({ position, rotationY, size }) {
   )
 }
 
-export default function Workbench({ ringRadius }) {
-  const width = ringRadius * 3.8
-  const depth = ringRadius * 2.7
-  const thickness = Math.max(0.06, ringRadius * 0.07)
+export default function Workbench({ cmPerUnit }) {
+  const cm = (value) => value / cmPerUnit
+  const width = cm(150)
+  const depth = cm(90)
+  const thickness = cm(4)
   const planks = 7
-  const legHeight = ringRadius * 2.2
-  const leg = ringRadius * 0.12
+  const legHeight = cm(80)
+  const leg = cm(7)
 
   const planksTop = useMemo(
     () =>
@@ -75,13 +77,13 @@ export default function Workbench({ ringRadius }) {
         const plankDepth = depth / planks
         return {
           z: -depth / 2 + plankDepth * (index + 0.5),
-          depth: plankDepth - ringRadius * 0.012,
+          depth: plankDepth - cm(0.3),
           color: WOOD[index % WOOD.length],
           // Tiny height differences between planks, like a well-used bench.
-          y: -thickness / 2 - (index % 3) * ringRadius * 0.0015,
+          y: -thickness / 2 - (index % 3) * cm(0.03),
         }
       }),
-    [depth, ringRadius, thickness],
+    [depth, thickness, cmPerUnit], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   const legX = width / 2 - leg * 1.2
@@ -112,15 +114,16 @@ export default function Workbench({ ringRadius }) {
         />
       ))}
 
-      {/* Props: a stack of pots at the back left and a trowel at the front right (the desk
-          lamp stands at the back right). */}
-      <group position={[-width * 0.38, 0, -depth * 0.3]}>
-        <Pot position={[0, 0, 0]} radius={ringRadius * 0.14} />
-        <Pot position={[0, ringRadius * 0.1, 0]} radius={ringRadius * 0.14} />
-        <Pot position={[0, ringRadius * 0.2, 0]} radius={ringRadius * 0.14} />
-        <Pot position={[ringRadius * 0.3, 0, ringRadius * 0.12]} radius={ringRadius * 0.09} />
+      {/* Props, all outside the biggest container: a stack of pots at the back left and a
+          trowel at the front right (the desk lamp stands at the back right). */}
+      <group position={[cm(-62), 0, cm(-28)]}>
+        <Pot position={[0, 0, 0]} radius={cm(7)} />
+        <Pot position={[0, cm(5), 0]} radius={cm(7)} />
+        <Pot position={[0, cm(10), 0]} radius={cm(7)} />
+        <Pot position={[cm(-2), 0, cm(17)]} radius={cm(4.5)} />
       </group>
-      <Trowel position={[width * 0.31, 0, depth * 0.16]} rotationY={-0.9} size={ringRadius * 0.55} />
+      {/* A 28 cm hand trowel. */}
+      <Trowel position={[cm(60), 0, cm(16)]} rotationY={-0.9} size={cm(45)} />
     </group>
   )
 }

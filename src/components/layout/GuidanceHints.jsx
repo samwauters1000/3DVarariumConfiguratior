@@ -11,7 +11,8 @@ import { useSceneApi } from '../../hooks/useSceneApi.jsx'
 // 2. One tip at a time (bottom), only when it is useful, and it disappears for good once the
 //    person has done it (or closes it):
 //    - "Drag to turn": once there is a terrarium; done when the view is turned or zoomed.
-//    - "Drag it to move it": when an item is selected; done when it is moved, turned or resized.
+//    - With an item selected, three short tips in turn: its size (− / +), then moving it, then
+//      deleting it. Each is done once the person has resized, moved or deleted an item.
 // Done tips are remembered in this browser.
 
 const DONE_KEY = 'vararium:tips-done'
@@ -41,7 +42,6 @@ function useDoneTips() {
   return [done, markDone]
 }
 
-const transformOf = (instance) => (instance ? JSON.stringify([instance.position, instance.rotation, instance.scale]) : null)
 
 export default function GuidanceHints() {
   const { configuration, selection } = useConfigurator()
@@ -67,33 +67,46 @@ export default function GuidanceHints() {
     }
   }, [controlsRef, done]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // "Drag it to move it" is done once the selected item is moved, turned or resized.
+  // The item tips (size, then move, then delete) are each done once the person has done it:
+  // resized the selected item, moved it, or deleted an item.
   const selected = selection ? configuration[selection.categoryId]?.find((instance) => instance.instanceId === selection.instanceId) : null
-  const startTransform = useRef(null)
+  const start = useRef(null)
   useEffect(() => {
     if (!selected) {
-      startTransform.current = null
+      // The item that was selected is gone: it was deleted.
+      if (start.current && !configuration[start.current.categoryId]?.some((instance) => instance.instanceId === start.current.id)) markDone('delete')
+      start.current = null
       return
     }
-    const now = transformOf(selected)
-    if (startTransform.current?.id !== selected.instanceId) startTransform.current = { id: selected.instanceId, transform: now }
-    else if (startTransform.current.transform !== now) markDone('edit')
-  }, [selected]) // eslint-disable-line react-hooks/exhaustive-deps
+    const scale = JSON.stringify(selected.scale)
+    const position = JSON.stringify(selected.position)
+    if (start.current?.id !== selected.instanceId) {
+      start.current = { id: selected.instanceId, categoryId: selection.categoryId, scale, position }
+      return
+    }
+    // Resizing can nudge the item to keep it clear of others; that does not count as moving.
+    if (start.current.scale !== scale) markDone('size')
+    else if (start.current.position !== position) markDone('move')
+    start.current = { ...start.current, scale, position }
+  }, [selected, configuration]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 1. Step hint.
   let stepHint = null
   if (configuration.terrarium !== null && configuration.ground === null) stepHint = 'Next, choose a ground layer for the bottom of your terrarium'
-  else if (configuration.ground !== null && configuration.plants.length === 0)
-    stepHint = hasMouse ? 'Now add a plant: click one in the list, or drag it into the terrarium' : 'Now add a plant: press + on one in the list'
+  else if (configuration.ground !== null && configuration.plants.length === 0) stepHint = hasMouse ? 'Now add a plant: click one in the list' : 'Now add a plant: press + on one in the list'
 
-  // 2. One tip at a time.
+  // 2. One tip at a time. With an item selected: first its size, then moving it, then deleting.
   let tip = null
-  if (selected && !done.has('edit')) {
+  if (selected && !done.has('size')) {
+    tip = { id: 'size', icon: 'plus', text: 'Make it bigger or smaller with − and + in the bar above it.' }
+  } else if (selected && !done.has('move')) {
     tip = {
-      id: 'edit',
+      id: 'move',
       icon: 'move',
-      text: hasMouse ? 'Drag it to move it. Use the bar above it to turn or resize it.' : 'Drag it with your finger to move it. Use the bar above it to turn or resize it.',
+      text: hasMouse ? 'Drag it to a new spot, or press Move in the bar above it.' : 'Drag it with your finger, or press Move in the bar above it.',
     }
+  } else if (selected && !done.has('delete')) {
+    tip = { id: 'delete', icon: 'trash', text: 'Changed your mind? The bin in the bar above it deletes it.' }
   } else if (configuration.terrarium !== null && !done.has('rotate')) {
     tip = { id: 'rotate', icon: 'rotateLeft', text: hasMouse ? 'Drag the 3D view to turn it, scroll to zoom' : 'Drag with one finger to turn the view, pinch to zoom' }
   }

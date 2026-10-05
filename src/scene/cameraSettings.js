@@ -22,17 +22,51 @@ export const DEFAULT_VIEW = {
   maxDistance: 9,
 }
 
+// Every container is modelled in its own scene units (`cmPerUnit` in data/terrariums.js); the
+// workbench, pots and desk lamp have fixed real sizes in cm and are converted to those units,
+// so a container always stands at its real size on the same bench. Before a container is
+// chosen, the bench uses the Glass Dome's units.
+export const REFERENCE_CM_PER_UNIT = 13.2
+export const getCmPerUnit = (terrarium) => terrarium?.cmPerUnit ?? REFERENCE_CM_PER_UNIT
+
 // Framing before a terrarium is chosen: the whole workbench (top, edges and legs), looking at
 // the bench top instead of at a terrarium that is not there yet.
 export const EMPTY_VIEW = {
   ...DEFAULT_VIEW,
-  halfWidth: 3.6,
-  halfHeight: 2,
-  targetY: 0.05,
-  maxDistance: 14,
+  halfWidth: 7.2,
+  halfHeight: 4,
+  targetY: 0.1,
+  maxDistance: 28,
 }
 
-export const getView = (terrarium) => (terrarium ? { ...DEFAULT_VIEW, ...terrarium.view } : EMPTY_VIEW)
+const LARGEST_CONTAINER_CM = 90
+const SIZE_EXPONENT = 0.6
+
+// Largest real size of a container in cm, from its dimensions ("25 × 25 × 32 cm").
+export function getLargestSizeCm(terrarium) {
+  const sizes = String(terrarium?.dimensions ?? '').match(/\d+(\.\d+)?/g)?.map(Number) ?? []
+  return sizes.length > 0 ? Math.max(...sizes) : LARGEST_CONTAINER_CM
+}
+
+// Tight framing of the container itself: used for the summary picture and the PDF.
+export const getCaptureView = (terrarium) => (terrarium ? { ...DEFAULT_VIEW, ...terrarium.view } : EMPTY_VIEW)
+
+// Framing in the configurator, which shows the container at its real size on the bench.
+// The biggest container (the 90 cm Panorama Tank) fills the view. Smaller containers are
+// framed less tightly, so they look smaller next to the bench, pots and lamp: a 12 cm bottle
+// clearly looks small, while it stays big enough on screen to work on (zoom in for details).
+// SIZE_EXPONENT sets how much: 1 would be true to scale, 0 fills the view with every container.
+export function getView(terrarium) {
+  if (!terrarium) return EMPTY_VIEW
+  const view = getCaptureView(terrarium)
+  const roomAround = (LARGEST_CONTAINER_CM / getLargestSizeCm(terrarium)) ** SIZE_EXPONENT
+  return {
+    ...view,
+    halfWidth: view.halfWidth * roomAround,
+    halfHeight: view.halfHeight * roomAround,
+    maxDistance: view.maxDistance * roomAround,
+  }
+}
 
 export const getCameraTarget = (view) => [0, view.targetY, 0]
 
