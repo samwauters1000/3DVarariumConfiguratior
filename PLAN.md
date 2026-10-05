@@ -215,6 +215,18 @@ Also:
 
 Everything is switched off when the user prefers reduced motion (system setting); the camera flash is skipped too.
 
+### Changes after user testing (round 1)
+
+Feedback from tests with real people, and what was done (`styles/flow.css`):
+
+| # | Feedback | Status |
+|---|---|---|
+| 1 | Start over should be next to the undo button | **Done:** Start over sits in the undo / redo group at the top left of the 3D view, after a small divider (icon + "Start over"; icon only in narrow 3D views). It is no longer in the top bar. It can still be undone. |
+| 2 | Only one title: "Vararium Configurator" in bold on the left, where "Vararium" is now | To do |
+| 3 | The section navigation is too far from the options it controls | **Done:** on desktop the category rail moved from the far left to directly beside the options panel (3D view, rail, panel; 8 px from the panel), with its tooltips opening to the left. On tablet and phone it is a row of tabs (icon + label) joined onto the top of the panel, so tabs and options read as one block. |
+| 4 | Confirm is used as a "next" button | To do (flow idea needed) |
+| 5 | The overall flow needs fixing without cluttering the right side with buttons | To do (flow idea needed) |
+
 ### Building order and panel layout
 
 - **Sub-titles:** every heading inside the panel is a real sub-title, one step below the panel title: 17 px, bold, in the text colour, with a count where useful (`.section-label` and the foldable section headings). This covers Small / Medium / Large / Special, Choose a container, Special shapes, Choose a ground layer, Lid, Day light, Extra lights, Selected …, In your terrarium and Saved designs.
@@ -1550,9 +1562,9 @@ A dark colour is needed for contrast (the light palette colours are too light fo
 Mapped to the terrarium configurator:
 
 - **Top bar:** project title on the left, configuration name in the centre, live total price / Confirm button on the right.
-- **Left:** a vertical column of round icon buttons, one per category (Terrarium, Ground, Plants, Decoration, Animals). The active category is filled with the primary colour and shows a tooltip label. Inactive future categories are shown disabled.
+- **Category rail:** a vertical column of round icon buttons, one per category. After user testing it sits directly beside the options panel instead of on the far left (see "Changes after user testing"); on tablet and phone it is a tab row joined onto the panel. The active category is filled with the primary colour and shows a tooltip label. Inactive future categories are shown disabled.
 - **Centre:** the 3D scene fills the viewport. The terrarium stands on a wooden workbench (see `3DWorkkbench.jpg` below; this replaced the original soft floor with a grid), with a ring around it hinting that it can be rotated.
-- **Top-left of the scene:** undo / redo and a badge with the chosen container. This row lines up with the panel title: both use the `--overlay-row-height` token (36 px) and a 16 px top inset. (No item counter: the options panel already lists what is selected.)
+- **Top-left of the scene:** undo / redo / Start over and a badge with the chosen container. This row lines up with the panel title: both use the `--overlay-row-height` token (36 px) and a 16 px top inset. (No item counter: the options panel already lists what is selected.)
 - **Floating toolbar above a selected object:** contextual actions such as move, rotate, scale and delete (Phase 9).
   - It always stays inside the 3D view on every device (`scene/ClampToStage.jsx`): when the object is near an edge, the toolbar slides back in instead of running off the screen, and it stays below the top row of controls.
   - In narrow 3D views (phones, small tablets; a container query on the 3D view, under 520 px) it becomes compact: the object name is hidden (the panel shows it) and the buttons are slightly smaller, so the whole toolbar fits.

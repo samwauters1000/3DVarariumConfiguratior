@@ -1,0 +1,135 @@
+/* ---------- Layout after user testing ----------
+   - Start over sits with undo / redo in the 3D view (not in the top bar).
+   - The section navigation (category rail) sits right next to the options panel it
+     controls, instead of on the far side of the 3D view:
+     desktop: a slim column directly beside the panel; tablet and phone: a row of tabs joined
+     onto the top of the panel, so they read as one block. */
+
+/* Start over in the history group. */
+.history-controls__divider {
+  align-self: center;
+  width: 1px;
+  height: 18px;
+  margin: 0 2px;
+  background: var(--color-border-strong);
+}
+
+.history-controls__button--label {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  width: auto;
+  gap: 6px;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.stage.is-night .history-controls__divider {
+  background: var(--glass-dark-edge);
+}
+
+/* Narrow 3D views: Start over becomes an icon, like undo and redo. */
+@container stage (max-width: 520px) {
+  .history-controls__label {
+    display: none;
+  }
+
+  .history-controls__button--label {
+    width: 30px;
+    padding: 0;
+  }
+}
+
+/* Desktop: 3D view | rail | panel, with the rail tucked against the panel. */
+@media (min-width: 961px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) var(--rail-width) var(--panel-width);
+    grid-template-areas: 'stage rail panel';
+  }
+
+  .category-rail {
+    justify-self: end;
+    margin-right: calc(var(--space-2) - var(--gutter));
+  }
+
+  /* Tooltips open to the left now, over the 3D view instead of over the panel. */
+  .category-button__label {
+    left: auto;
+    right: calc(100% + var(--space-3));
+    transform: translate(4px, -50%);
+  }
+}
+
+/* Tablet and phone: 3D view on top, then the tabs joined onto the panel. */
+@media (max-width: 960px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'stage'
+      'rail'
+      'panel';
+    row-gap: 0;
+  }
+
+  .stage {
+    margin-bottom: var(--gutter);
+  }
+
+  .category-rail {
+    align-self: stretch;
+  }
+
+  .category-rail__list {
+    flex-direction: row;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-2) var(--space-1);
+    border-radius: var(--radius-surface) var(--radius-surface) 0 0;
+    box-shadow: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .category-rail__list > li {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .panel {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  /* Tabs with an icon and a label underneath. */
+  .category-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    height: 60px;
+  }
+
+  .category-button__label,
+  .category-button.is-active .category-button__label,
+  .category-button:hover .category-button__label {
+    position: static;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: 0.75rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  .category-button__badge {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .category-button__label,
+  .category-button.is-active .category-button__label {
+    font-size: 0.6875rem;
+  }
+}

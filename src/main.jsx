@@ -10,6 +10,7 @@ import './styles/glass.css'
 import './styles/move.css'
 import './styles/motion.css'
 import './styles/auth.css'
+import './styles/flow.css'
 import { installMicroAnimations } from './utils/microAnimations.js'
 
 installMicroAnimations()

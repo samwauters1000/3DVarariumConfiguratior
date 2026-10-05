@@ -1,11 +1,7 @@
 import Icon from '../common/Icon.jsx'
 import AccountButton from '../auth/AccountButton.jsx'
-import { useConfigurator, initialConfiguration } from '../../hooks/useConfigurator.jsx'
 
 export default function TopBar({ onOpenSavedDesigns }) {
-  const { configuration, resetConfiguration } = useConfigurator()
-  const isEmpty = configuration === initialConfiguration
-
   return (
     <header className="top-bar">
       <div className="top-bar__brand">
@@ -17,17 +13,7 @@ export default function TopBar({ onOpenSavedDesigns }) {
           <Icon name="bookmark" size={18} />
           <span className="button__label">Saved designs</span>
         </button>
-        <button
-          type="button"
-          className="button button--ghost"
-          data-anim="spin-back"
-          onClick={resetConfiguration}
-          disabled={isEmpty}
-          title="Start over (can be undone)"
-        >
-          <Icon name="rotateLeft" size={18} />
-          <span className="button__label">Start over</span>
-        </button>
+        {/* Start over moved next to undo / redo in the 3D view. */}
         {/* Optional login: "Sign in", or a round avatar with a menu when signed in. */}
         <AccountButton />
       </div>
