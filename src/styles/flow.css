@@ -184,8 +184,8 @@
   }
 }
 
-/* Under the section buttons: heading, what the section is for (larger), and what is
-   chosen with its price (smaller). */
+/* Under the section buttons: heading (16 px), what the section is for (15 px), and what is
+   chosen with its price (13 px). Text above the options stays between 12 and 16 px. */
 .panel__intro {
   display: flex;
   flex-direction: column;
