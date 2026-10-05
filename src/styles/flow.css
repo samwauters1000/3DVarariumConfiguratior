@@ -128,7 +128,8 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  border-radius: var(--radius-card);
+  /* Round (pill) shapes, like every other control: the band and the buttons. */
+  border-radius: var(--radius-control);
   background: var(--color-surface-sunken);
   box-shadow: inset 0 1px 2px rgba(47, 67, 43, 0.08);
 }
@@ -143,7 +144,7 @@
   min-height: 54px;
   padding: 6px 2px;
   border: 0;
-  border-radius: calc(var(--radius-card) - 4px);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-text-muted);
   transition: background-color var(--transition), color var(--transition), box-shadow var(--transition);
