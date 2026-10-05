@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import { useSceneApi } from '../hooks/useSceneApi.jsx'
-import { getCameraTarget, getDefaultCameraPosition, getCaptureView } from './cameraSettings.js'
+import { getCameraTarget, getDefaultCameraPosition, getView } from './cameraSettings.js'
 
 // Registers a snapshot function so the summary and PDF can show the finished terrarium.
-// The snapshot uses a tight framing of the terrarium (getCaptureView), or the current view
+// The snapshot uses the terrarium's default camera framing, or the current view
 // with keepView (for "Save picture"), and hides editing helpers.
 export default function SceneBridge({ terrarium }) {
   const { gl, scene, camera } = useThree()
   const { captureRef } = useSceneApi()
 
   useEffect(() => {
-    const view = getCaptureView(terrarium)
+    const view = getView(terrarium)
     captureRef.current = ({ keepView = false } = {}) => {
       const hidden = []
       scene.traverse((object) => {

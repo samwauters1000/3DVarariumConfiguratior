@@ -40,7 +40,6 @@ export const EMPTY_VIEW = {
 }
 
 const LARGEST_CONTAINER_CM = 90
-const SIZE_EXPONENT = 0.6
 
 // Largest real size of a container in cm, from its dimensions ("25 × 25 × 32 cm").
 export function getLargestSizeCm(terrarium) {
@@ -48,24 +47,13 @@ export function getLargestSizeCm(terrarium) {
   return sizes.length > 0 ? Math.max(...sizes) : LARGEST_CONTAINER_CM
 }
 
-// Tight framing of the container itself: used for the summary picture and the PDF.
-export const getCaptureView = (terrarium) => (terrarium ? { ...DEFAULT_VIEW, ...terrarium.view } : EMPTY_VIEW)
-
-// Framing in the configurator, which shows the container at its real size on the bench.
-// The biggest container (the 90 cm Panorama Tank) fills the view. Smaller containers are
-// framed less tightly, so they look smaller next to the bench, pots and lamp: a 12 cm bottle
-// clearly looks small, while it stays big enough on screen to work on (zoom in for details).
-// SIZE_EXPONENT sets how much: 1 would be true to scale, 0 fills the view with every container.
+// Every container fills the view when it is chosen, so small ones are easy to work on. Small
+// containers can be zoomed out further, to see them at their real size on the bench next to
+// the pots and lamp (a 12 cm bottle as far as the 90 cm tank).
 export function getView(terrarium) {
   if (!terrarium) return EMPTY_VIEW
-  const view = getCaptureView(terrarium)
-  const roomAround = (LARGEST_CONTAINER_CM / getLargestSizeCm(terrarium)) ** SIZE_EXPONENT
-  return {
-    ...view,
-    halfWidth: view.halfWidth * roomAround,
-    halfHeight: view.halfHeight * roomAround,
-    maxDistance: view.maxDistance * roomAround,
-  }
+  const view = { ...DEFAULT_VIEW, ...terrarium.view }
+  return { ...view, maxDistance: view.maxDistance * (LARGEST_CONTAINER_CM / getLargestSizeCm(terrarium)) ** 0.6 }
 }
 
 export const getCameraTarget = (view) => [0, view.targetY, 0]
